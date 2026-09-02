@@ -5,7 +5,7 @@ import {
   ChevronDown, ExternalLink, Download, Mail, Phone, MapPin,
   Menu, X, FileText, Cpu, Network, Briefcase, GraduationCap,
   Layers, HardDrive, CheckCircle2, Lock, Zap, Clock, ArrowRight,
-  TrendingUp, Award, RefreshCw, Eye
+  TrendingUp, Award, RefreshCw, Eye, ArrowUp, Sparkles, Check
 } from 'lucide-react';
 import profilePhoto from './assets/Abhishek_Singh_JPG.jpg';
 
@@ -30,15 +30,43 @@ const GitHubIcon = () => (
 
 export default function App() {
   const [selectedCert, setSelectedCert] = useState<{ name: string; issuer: string; id?: string; file: string | null } | null>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    // Ensure initial scroll position starts at top of page
+    window.scrollTo(0, 0);
+
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const currentScroll = window.scrollY;
+      setScrollProgress(totalScroll > 0 ? (currentScroll / totalScroll) * 100 : 0);
+      setShowBackToTop(currentScroll > 400);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 font-sans selection:bg-blue-500/30 selection:text-blue-300 relative overflow-x-hidden">
+      {/* Top Scroll Progress Bar */}
+      <div 
+        className="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-blue-500 via-cyan-400 to-indigo-500 z-[100] transition-all duration-150"
+        style={{ width: `${scrollProgress}%` }}
+      />
+
       {/* Dynamic Cyber Grid Background */}
       <div className="fixed inset-0 pointer-events-none opacity-20 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] z-0" />
       
-      {/* Ambient Glows */}
-      <div className="fixed top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none z-0 animate-pulse" />
-      <div className="fixed bottom-1/3 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none z-0" />
+      {/* Ambient Radial Glows */}
+      <div className="fixed top-0 left-1/4 w-[32rem] h-[32rem] bg-blue-500/10 rounded-full blur-3xl pointer-events-none z-0 animate-pulse" />
+      <div className="fixed bottom-1/3 right-10 w-[30rem] h-[30rem] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none z-0" />
+      <div className="fixed top-2/3 left-10 w-[24rem] h-[24rem] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none z-0" />
 
       <Header />
       
@@ -59,6 +87,22 @@ export default function App() {
       </main>
 
       <Footer />
+
+      {/* Floating Back to Top Button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-blue-600/90 hover:bg-blue-500 text-white shadow-[0_0_25px_rgba(59,130,246,0.5)] border border-blue-400/40 backdrop-blur-md transition-all hover:-translate-y-1 group"
+            aria-label="Back to top"
+          >
+            <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Certificate Lightbox Modal */}
       <AnimatePresence>
@@ -87,24 +131,25 @@ function Header() {
         const el = document.getElementById(section);
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.top <= 150 && rect.bottom >= 150) {
+          if (rect.top <= 160 && rect.bottom >= 160) {
             setActiveSection(section);
             break;
           }
         }
       }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navItems = [
     { label: 'Overview', href: '#home', id: 'home' },
+    { label: 'Shell', href: '#terminal', id: 'terminal' },
     { label: 'Architecture', href: '#architecture', id: 'architecture' },
     { label: 'Skills', href: '#skills', id: 'skills' },
     { label: 'Career', href: '#career', id: 'career' },
     { label: 'Projects', href: '#projects', id: 'projects' },
-    { label: 'Certifications', href: '#certifications', id: 'certifications' },
+    { label: 'Certs', href: '#certifications', id: 'certifications' },
     { label: 'Contact', href: '#contact', id: 'contact' },
   ];
 
@@ -112,11 +157,11 @@ function Header() {
     <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0d14]/90 backdrop-blur-md border-b border-slate-800/80 py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <a href="#home" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:border-blue-400 group-hover:scale-105 transition-all shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-            <TerminalIcon className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:border-blue-400 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all">
+            <TerminalIcon className="w-5 h-5 group-hover:rotate-6 transition-transform" />
           </div>
           <div>
-            <div className="text-base font-bold tracking-tight text-white flex items-center gap-2">
+            <div className="text-base font-bold tracking-tight text-white flex items-center gap-2 group-hover:text-blue-300 transition-colors">
               <span>Abhishek Singh</span>
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             </div>
@@ -125,15 +170,15 @@ function Header() {
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1 bg-slate-900/60 p-1.5 rounded-full border border-slate-800/80 backdrop-blur-sm">
+        <nav className="hidden lg:flex items-center gap-1 bg-slate-900/70 p-1.5 rounded-full border border-slate-800/80 backdrop-blur-md shadow-inner">
           {navItems.map((item) => (
             <a
               key={item.id}
               href={item.href}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                 activeSection === item.id
-                  ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.5)]'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/50'
+                  ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.6)] font-semibold'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
               }`}
             >
               {item.label}
@@ -147,7 +192,7 @@ function Header() {
             href={getAssetUrl('Abhishek_Singh_Resume_30-08-2026.pdf')}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 hover:border-blue-500 text-xs font-semibold tracking-wide transition-all shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 hover:border-blue-500 text-xs font-semibold tracking-wide transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] hover:-translate-y-0.5"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Resume</span>
@@ -156,17 +201,26 @@ function Header() {
             href="https://linkedin.com/in/abhishek-singh-4489ab265"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-blue-400 border border-slate-800 transition-colors"
+            className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-[#0a66c2] text-slate-300 hover:text-white border border-slate-800 hover:border-[#0a66c2] transition-all hover:scale-105 shadow-md"
             title="LinkedIn Profile"
           >
             <LinkedInIcon />
+          </a>
+          <a
+            href="https://github.com/7080dhiru-star"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-600 transition-all hover:scale-105 shadow-md"
+            title="GitHub Profile"
+          >
+            <GitHubIcon />
           </a>
         </div>
 
         {/* Mobile Hamburger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden p-2 rounded-lg bg-slate-900 text-slate-300 border border-slate-800"
+          className="lg:hidden p-2.5 rounded-xl bg-slate-900 text-slate-300 border border-slate-800 hover:text-white transition-colors"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -180,16 +234,16 @@ function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-[#0a0d14]/95 border-b border-slate-800 px-6 py-6 overflow-hidden backdrop-blur-xl"
+            className="lg:hidden bg-[#0a0d14]/98 border-b border-slate-800 px-6 py-6 overflow-hidden backdrop-blur-2xl"
           >
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               {navItems.map((item) => (
                 <a
                   key={item.id}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`px-4 py-2.5 rounded-lg text-sm font-medium ${
-                    activeSection === item.id ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800/60'
+                  className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    activeSection === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800/80'
                   }`}
                 >
                   {item.label}
@@ -200,7 +254,7 @@ function Header() {
                   href={getAssetUrl('Abhishek_Singh_Resume_30-08-2026.pdf')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 text-white font-semibold text-sm shadow-lg shadow-blue-500/20"
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm shadow-lg shadow-blue-500/25"
                 >
                   <Download className="w-4 h-4" /> Download Official Resume
                 </a>
@@ -227,14 +281,14 @@ function Hero() {
           {/* Left Hero Details */}
           <div className="lg:col-span-7 text-center lg:text-left">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6 }}
             >
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-800/60 text-blue-400 text-xs font-mono font-medium mb-6 backdrop-blur-sm">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>99.9% PRODUCTION UPTIME SLA • CLOUD & DEVOPS</span>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-950/70 border border-blue-700/60 text-blue-400 text-xs font-mono font-semibold mb-6 backdrop-blur-md shadow-lg shadow-blue-950/40">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>99.9% PRODUCTION SLA • CLOUD & DEVOPS ENGINEER</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
@@ -246,24 +300,24 @@ function Hero() {
               </h1>
 
               <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 mb-8 leading-relaxed">
-                Results-driven <strong className="text-white font-semibold">Cloud Engineer</strong> with hands-on expertise across <strong className="text-blue-400">AWS</strong>, <strong className="text-blue-400">GCP</strong>, <strong className="text-blue-400">VMware ESXi virtualization</strong>, Linux administration (Ubuntu), and enterprise datacenter operations. Standardizing CI/CD provisioning to accelerate release velocity and ensure high availability.
+                Results-driven <strong className="text-white font-semibold">Cloud Engineer</strong> with hands-on expertise across <strong className="text-blue-400 font-semibold">AWS</strong>, <strong className="text-blue-400 font-semibold">GCP</strong>, <strong className="text-blue-400 font-semibold">VMware ESXi virtualization</strong>, Linux administration (Ubuntu), and enterprise datacenter operations. Standardizing CI/CD provisioning to accelerate release velocity and ensure high availability.
               </p>
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10">
                 <a
                   href="#architecture"
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm transition-all shadow-[0_0_25px_rgba(59,130,246,0.35)] hover:shadow-[0_0_35px_rgba(59,130,246,0.55)] hover:-translate-y-0.5"
+                  className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm transition-all shadow-[0_0_25px_rgba(59,130,246,0.35)] hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] hover:-translate-y-1"
                 >
                   <Layers className="w-4 h-4" />
-                  <span>Explore Infrastructure</span>
+                  <span>Explore Architecture</span>
                 </a>
                 
                 <a
                   href={getAssetUrl('Abhishek_Singh_Resume_30-08-2026.pdf')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-slate-600 font-semibold text-sm transition-all hover:-translate-y-0.5"
+                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-blue-500/50 font-semibold text-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/50"
                 >
                   <Download className="w-4 h-4 text-blue-400" />
                   <span>Download Resume</span>
@@ -271,7 +325,7 @@ function Hero() {
 
                 <a
                   href="#contact"
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/50 text-slate-400 hover:text-slate-200 text-sm font-medium transition-colors"
+                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/60 text-slate-400 hover:text-white border border-transparent hover:border-slate-800 text-sm font-medium transition-all hover:-translate-y-0.5"
                 >
                   <span>Let's Connect</span>
                   <ArrowRight className="w-4 h-4" />
@@ -280,16 +334,16 @@ function Hero() {
 
               {/* Quick Tech Highlights */}
               <div className="pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-slate-400 font-mono">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-900/50 border border-slate-800/80 hover:border-blue-500/40 hover:text-blue-300 transition-all cursor-default">
                   <Cloud className="w-4 h-4 text-blue-400" /> AWS & GCP
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-900/50 border border-slate-800/80 hover:border-emerald-500/40 hover:text-emerald-300 transition-all cursor-default">
                   <Server className="w-4 h-4 text-emerald-400" /> VMware ESXi
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-900/50 border border-slate-800/80 hover:border-amber-500/40 hover:text-amber-300 transition-all cursor-default">
                   <TerminalIcon className="w-4 h-4 text-amber-400" /> Ubuntu Linux
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-900/50 border border-slate-800/80 hover:border-purple-500/40 hover:text-purple-300 transition-all cursor-default">
                   <Shield className="w-4 h-4 text-purple-400" /> OCI & Fortinet Certified
                 </div>
               </div>
@@ -310,14 +364,14 @@ function Hero() {
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 via-cyan-500/20 to-transparent rounded-full blur-2xl -z-10" />
 
               {/* Profile Avatar Card */}
-              <div className="w-72 h-72 sm:w-84 sm:h-84 md:w-96 md:h-96 rounded-full p-2.5 bg-gradient-to-b from-blue-500/40 via-slate-800 to-slate-900 border-2 border-blue-500/40 shadow-[0_0_50px_rgba(37,99,235,0.3)] relative group">
+              <div className="w-72 h-72 sm:w-84 sm:h-84 md:w-96 md:h-96 rounded-full p-2.5 bg-gradient-to-b from-blue-500/40 via-slate-800 to-slate-900 border-2 border-blue-500/40 shadow-[0_0_50px_rgba(37,99,235,0.3)] relative group hover:border-blue-400 transition-all duration-500">
                 <div className="w-full h-full rounded-full overflow-hidden bg-slate-950 flex items-center justify-center relative">
                   {!imageError ? (
                     <img
                       src={profilePhoto}
                       alt="Abhishek Singh - Cloud & DevOps Engineer"
                       onError={() => setImageError(true)}
-                      className="w-full h-full object-cover object-top scale-105 group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover object-top scale-105 group-hover:scale-110 transition-transform duration-700"
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-center p-6 text-slate-400">
@@ -331,11 +385,11 @@ function Hero() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#07090e]/80 via-transparent to-transparent pointer-events-none" />
                 </div>
 
-                {/* Orbiting Tech Badges */}
+                {/* Orbiting Tech Badges with hover interaction */}
                 <motion.div 
                   animate={{ y: [0, -8, 0] }}
                   transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                  className="absolute -top-2 -left-4 bg-[#0d121d]/90 backdrop-blur-md border border-blue-500/30 px-3.5 py-2 rounded-xl shadow-xl flex items-center gap-2.5"
+                  className="absolute -top-2 -left-4 bg-[#0d121d]/95 backdrop-blur-md border border-blue-500/40 px-3.5 py-2 rounded-2xl shadow-xl flex items-center gap-2.5 hover:scale-105 hover:border-blue-400 transition-all cursor-default"
                 >
                   <div className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />
                   <div>
@@ -347,7 +401,7 @@ function Hero() {
                 <motion.div 
                   animate={{ y: [0, 8, 0] }}
                   transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
-                  className="absolute bottom-6 -right-6 bg-[#0d121d]/90 backdrop-blur-md border border-emerald-500/30 px-3.5 py-2 rounded-xl shadow-xl flex items-center gap-2.5"
+                  className="absolute bottom-6 -right-6 bg-[#0d121d]/95 backdrop-blur-md border border-emerald-500/40 px-3.5 py-2 rounded-2xl shadow-xl flex items-center gap-2.5 hover:scale-105 hover:border-emerald-400 transition-all cursor-default"
                 >
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                   <div>
@@ -359,7 +413,7 @@ function Hero() {
                 <motion.div 
                   animate={{ y: [0, -6, 0] }}
                   transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut", delay: 2 }}
-                  className="absolute -bottom-4 left-6 bg-[#0d121d]/90 backdrop-blur-md border border-purple-500/30 px-3 py-1.5 rounded-xl shadow-xl flex items-center gap-2"
+                  className="absolute -bottom-4 left-6 bg-[#0d121d]/95 backdrop-blur-md border border-purple-500/40 px-3.5 py-2 rounded-2xl shadow-xl flex items-center gap-2 hover:scale-105 hover:border-purple-400 transition-all cursor-default"
                 >
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
                   <span className="text-[10px] font-semibold text-slate-200">20% Deployment Speedup</span>
@@ -395,16 +449,23 @@ function StatsBar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, idx) => (
-            <div key={idx} className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800 flex items-start gap-4 hover:border-blue-500/30 transition-all group">
-              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 group-hover:scale-110 transition-transform">
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: idx * 0.1 }}
+              className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800 flex items-start gap-4 hover:border-blue-500/40 hover:bg-slate-900/90 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] hover:-translate-y-1 transition-all duration-300 group cursor-default"
+            >
+              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 group-hover:scale-110 group-hover:border-blue-500/40 group-hover:bg-blue-600/10 transition-all duration-300">
                 {stat.icon}
               </div>
               <div>
-                <div className="text-2xl font-bold text-white tracking-tight">{stat.value}</div>
+                <div className="text-2xl font-bold text-white tracking-tight group-hover:text-blue-300 transition-colors">{stat.value}</div>
                 <div className="text-xs font-semibold text-slate-300 mt-0.5">{stat.label}</div>
                 <div className="text-[11px] text-slate-500 mt-1 font-mono">{stat.detail}</div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -427,7 +488,8 @@ function InteractiveTerminal() {
     }
   ]);
   const [inputVal, setInputVal] = useState('');
-  const terminalEndRef = useRef<HTMLDivElement>(null);
+  const terminalContainerRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   const executeCommand = (rawCmd: string) => {
     const cmd = rawCmd.trim().toLowerCase();
@@ -477,8 +539,15 @@ function InteractiveTerminal() {
     }
   };
 
+  // ONLY scroll internal terminal container on user commands, NEVER the main window
   useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (terminalContainerRef.current) {
+      terminalContainerRef.current.scrollTop = terminalContainerRef.current.scrollHeight;
+    }
   }, [history]);
 
   const quickCommands = ['help', 'whoami', 'skills', 'infra', 'experience', 'certs', 'contact'];
@@ -486,59 +555,74 @@ function InteractiveTerminal() {
   return (
     <section id="terminal" className="py-20 bg-[#07090e] relative">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-8"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
             <TerminalIcon className="w-3.5 h-3.5" />
             <span>INTERACTIVE CLOUD SHELL</span>
           </div>
           <h2 className="text-3xl font-bold text-white tracking-tight">Interactive Engineer Console</h2>
           <p className="text-sm text-slate-400 mt-2">Test my background and infrastructure knowledge directly via shell commands.</p>
-        </div>
+        </motion.div>
 
         {/* Quick Command Chips */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-          <span className="text-xs text-slate-500 font-mono">Try running:</span>
+          <span className="text-xs text-slate-500 font-mono">Quick CLI:</span>
           {quickCommands.map((q) => (
             <button
               key={q}
               onClick={() => executeCommand(q)}
-              className="px-2.5 py-1 rounded-md bg-slate-900 hover:bg-blue-900/40 text-blue-400 hover:text-blue-300 border border-slate-800 text-xs font-mono transition-colors"
+              className="px-3 py-1 rounded-lg bg-slate-900 hover:bg-blue-600 hover:text-white text-blue-400 border border-slate-800 hover:border-blue-500 text-xs font-mono transition-all duration-200 shadow-sm hover:scale-105 active:scale-95"
             >
               ${q}
             </button>
           ))}
         </div>
 
-        {/* Terminal Window */}
-        <div className="rounded-2xl bg-[#090d16] border border-slate-800 shadow-2xl overflow-hidden font-mono text-sm">
+        {/* Terminal Window with Hover Shadow */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="rounded-2xl bg-[#090d16] border border-slate-800 hover:border-blue-500/40 hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] transition-all duration-300 shadow-2xl overflow-hidden font-mono text-sm"
+        >
           {/* Terminal Titlebar */}
           <div className="px-4 py-3 bg-[#0d121f] border-b border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block" />
-              <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
-              <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+              <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block hover:scale-110 transition-transform cursor-pointer" />
+              <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block hover:scale-110 transition-transform cursor-pointer" />
+              <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block hover:scale-110 transition-transform cursor-pointer" />
               <span className="ml-2 text-xs text-slate-400 font-semibold">abhishek@cloud-node-01: ~</span>
             </div>
-            <div className="text-[11px] text-slate-500">bash / zsh 5.9</div>
+            <div className="text-[11px] text-slate-500 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>bash / zsh 5.9</span>
+            </div>
           </div>
 
           {/* Terminal Body */}
-          <div className="p-6 min-h-[260px] max-h-[380px] overflow-y-auto space-y-4">
+          <div ref={terminalContainerRef} className="p-6 min-h-[260px] max-h-[380px] overflow-y-auto space-y-4">
             <div className="text-slate-500 text-xs">
               Welcome to Abhishek Singh Cloud Terminal v2.4 (x86_64-pc-linux-gnu).<br />
-              Type <span className="text-blue-400">help</span> to view available system telemetry commands.
+              Type <span className="text-blue-400 font-semibold">help</span> to view available system telemetry commands.
             </div>
 
             {history.map((item, i) => (
               <div key={i} className="space-y-1">
                 <div className="flex items-center gap-2 text-slate-300">
-                  <span className="text-emerald-400">abhishek@prod-cloud</span>
+                  <span className="text-emerald-400 font-semibold">abhishek@prod-cloud</span>
                   <span className="text-slate-600">:</span>
                   <span className="text-blue-400">~</span>
                   <span className="text-slate-500">$</span>
                   <span className="text-white font-semibold">{item.cmd}</span>
                 </div>
-                <div className="text-slate-300 pl-4 border-l border-slate-800 py-0.5 text-xs leading-relaxed">
+                <div className="text-slate-300 pl-4 border-l-2 border-blue-500/40 py-0.5 text-xs leading-relaxed bg-blue-950/10 rounded-r">
                   {item.output}
                 </div>
               </div>
@@ -546,7 +630,7 @@ function InteractiveTerminal() {
 
             {/* Live Input Line */}
             <div className="flex items-center gap-2 text-slate-300 pt-2">
-              <span className="text-emerald-400">abhishek@prod-cloud</span>
+              <span className="text-emerald-400 font-semibold">abhishek@prod-cloud</span>
               <span className="text-slate-600">:</span>
               <span className="text-blue-400">~</span>
               <span className="text-slate-500">$</span>
@@ -559,9 +643,8 @@ function InteractiveTerminal() {
                 className="flex-1 bg-transparent border-none outline-none text-white font-mono text-sm placeholder:text-slate-700 focus:ring-0"
               />
             </div>
-            <div ref={terminalEndRef} />
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -627,8 +710,14 @@ function ArchitectureVisualizer() {
   return (
     <section id="architecture" className="py-24 bg-[#0a0d16] border-t border-slate-800/80 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
             <Layers className="w-3.5 h-3.5" />
             <span>INFRASTRUCTURE TOPOLOGY</span>
           </div>
@@ -638,52 +727,62 @@ function ArchitectureVisualizer() {
           <p className="text-slate-400 max-w-2xl mx-auto mt-3 text-sm sm:text-base">
             How I architect, secure, virtualize, and automate production workloads from code push to 99.9% SLA uptime.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Pipeline Grid */}
+        {/* Pipeline Grid with Rich Hover Effects */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pipelineSteps.map((step, idx) => (
-            <div
+            <motion.div
               key={step.id}
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: idx * 0.08 }}
               onMouseEnter={() => setActiveStep(idx)}
               onMouseLeave={() => setActiveStep(null)}
-              className={`p-6 rounded-2xl bg-slate-900/60 border transition-all duration-300 relative overflow-hidden cursor-pointer ${
+              className={`p-6 rounded-3xl bg-slate-900/60 border transition-all duration-300 relative overflow-hidden cursor-pointer ${
                 activeStep === idx 
-                  ? 'border-blue-500 bg-slate-900 shadow-[0_0_30px_rgba(59,130,246,0.2)] -translate-y-1' 
-                  : 'border-slate-800 hover:border-slate-700'
+                  ? 'border-blue-500/80 bg-slate-900 shadow-[0_0_35px_rgba(59,130,246,0.25)] -translate-y-2 scale-[1.02]' 
+                  : 'border-slate-800 hover:border-slate-700 hover:-translate-y-1'
               }`}
             >
               {/* Step Number */}
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 text-white">
+                <div className={`p-3 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-white transition-transform duration-300 ${activeStep === idx ? 'scale-110 bg-blue-600/20 border-blue-500/40' : ''}`}>
                   {step.icon}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                  <span className={`text-[11px] font-mono px-3 py-1 rounded-full border transition-colors ${activeStep === idx ? 'bg-blue-600 text-white border-blue-400 font-bold' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>
                     Stage 0{step.id}
                   </span>
                 </div>
               </div>
 
-              <div className="text-xs font-mono font-medium text-blue-400 mb-1">{step.badge}</div>
-              <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-              <p className="text-xs text-slate-400 leading-relaxed mb-4">{step.desc}</p>
+              <div className="text-xs font-mono font-semibold text-blue-400 mb-1">{step.badge}</div>
+              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-200">{step.title}</h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-5">{step.desc}</p>
               
               <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400 font-mono">
                 <span className="text-slate-500">Tech:</span>
-                <span className="text-slate-300 font-semibold">{step.tech}</span>
+                <span className="text-slate-200 font-semibold">{step.tech}</span>
               </div>
 
               {/* Glowing Corner Accent */}
               {activeStep === idx && (
-                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-xl pointer-events-none" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
               )}
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Multi-Cloud & Hypervisor Interconnect Banner */}
-        <div className="mt-12 p-6 rounded-2xl bg-gradient-to-r from-blue-950/40 via-slate-900 to-indigo-950/40 border border-blue-900/40 flex flex-col md:flex-row items-center justify-between gap-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="mt-12 p-7 rounded-3xl bg-gradient-to-r from-blue-950/50 via-slate-900 to-indigo-950/50 border border-blue-900/50 hover:border-blue-500/50 hover:shadow-[0_0_35px_rgba(59,130,246,0.2)] transition-all duration-300 flex flex-col md:flex-row items-center justify-between gap-6"
+        >
           <div className="flex items-center gap-4">
             <div className="p-3.5 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30">
               <HardDrive className="w-6 h-6" />
@@ -693,15 +792,15 @@ function ArchitectureVisualizer() {
               <p className="text-xs text-slate-400 mt-0.5">Combining VMware ESXi on-premise control with AWS & GCP elastic cloud scale.</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="px-3 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-mono">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="px-3.5 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-mono font-medium hover:scale-105 transition-transform cursor-default">
               ✓ 99.9% High Availability
             </span>
-            <span className="px-3 py-1.5 rounded-lg bg-blue-950/80 border border-blue-800/80 text-blue-400 text-xs font-mono">
+            <span className="px-3.5 py-1.5 rounded-xl bg-blue-950/80 border border-blue-800/80 text-blue-400 text-xs font-mono font-medium hover:scale-105 transition-transform cursor-default">
               ✓ Automated DR & Backups
             </span>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -716,8 +815,14 @@ function AboutSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          <div className="lg:col-span-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-4">
+          <motion.div 
+            initial={{ opacity: 0, x: -25 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
+            className="lg:col-span-6"
+          >
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-4">
               <Briefcase className="w-3.5 h-3.5" />
               <span>ENGINEER PROFILE</span>
             </div>
@@ -727,72 +832,96 @@ function AboutSection() {
 
             <div className="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">
               <p>
-                I am a results-driven <strong className="text-white">Cloud Engineer</strong> currently managing production cloud and datacenter workloads at <strong className="text-blue-400">Purvaco Technology Pvt. Ltd.</strong> in Ghaziabad, India.
+                I am a results-driven <strong className="text-white">Cloud Engineer</strong> currently managing production cloud and datacenter workloads at <strong className="text-blue-400 font-semibold">Purvaco Technology Pvt. Ltd.</strong> in Ghaziabad, India.
               </p>
               <p>
                 My background bridges the full spectrum of modern infrastructure: from low-level datacenter hardware maintenance, RAID configuration, and VMware ESXi hypervisor virtualization, up to multi-cloud architecture across <strong className="text-white">AWS (EC2, S3, VPC, RDS, IAM)</strong> and <strong className="text-white">Google Cloud Platform (GCP, AlloyDB)</strong>.
               </p>
               <p>
-                I have a strong track record of maintaining strict <strong className="text-emerald-400">99.9% uptime SLAs</strong> for business-critical client applications, executing disaster recovery protocols, hardening security policies, and standardizing CI/CD provisioning workflows that reduced deployment latency by <strong className="text-blue-400">20%</strong>.
+                I have a strong track record of maintaining strict <strong className="text-emerald-400 font-semibold">99.9% uptime SLAs</strong> for business-critical client applications, executing disaster recovery protocols, hardening security policies, and standardizing CI/CD provisioning workflows that reduced deployment latency by <strong className="text-blue-400 font-semibold">20%</strong>.
               </p>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <span className="px-3.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Multi-Cloud (AWS & GCP)
+              <span className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-2 hover:border-blue-500/50 hover:bg-slate-800 hover:text-white transition-all cursor-default hover:scale-105">
+                <Check className="w-4 h-4 text-emerald-400" /> Multi-Cloud (AWS & GCP)
               </span>
-              <span className="px-3.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> VMware ESXi Virtualization
+              <span className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-2 hover:border-emerald-500/50 hover:bg-slate-800 hover:text-white transition-all cursor-default hover:scale-105">
+                <Check className="w-4 h-4 text-emerald-400" /> VMware ESXi Virtualization
               </span>
-              <span className="px-3.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Linux & Windows Admin
+              <span className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-2 hover:border-amber-500/50 hover:bg-slate-800 hover:text-white transition-all cursor-default hover:scale-105">
+                <Check className="w-4 h-4 text-emerald-400" /> Linux & Windows Admin
               </span>
-              <span className="px-3.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Disaster Recovery & RAID
+              <span className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 flex items-center gap-2 hover:border-purple-500/50 hover:bg-slate-800 hover:text-white transition-all cursor-default hover:scale-105">
+                <Check className="w-4 h-4 text-emerald-400" /> Disaster Recovery & RAID
               </span>
             </div>
-          </div>
+          </motion.div>
 
           <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/30 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center mb-4">
-                <Cloud className="w-5 h-5" />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4 }}
+              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(59,130,246,0.18)] hover:-translate-y-1.5 transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                <Cloud className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Cloud Operations</h3>
+              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">Cloud Operations</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Resource rightsizing, cost optimization, IAM access management, and high availability deployments across AWS and GCP.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/30 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center mb-4">
-                <Server className="w-5 h-5" />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(16,185,129,0.18)] hover:-translate-y-1.5 transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+                <Server className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Virtualization & OS</h3>
+              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">Virtualization & OS</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 VMware ESXi hypervisors, capacity planning, VM provisioning, Ubuntu Linux administration, and Windows Server 2016-2022.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-purple-500/30 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center mb-4">
-                <Shield className="w-5 h-5" />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-purple-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(168,85,247,0.18)] hover:-translate-y-1.5 transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                <Shield className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Security & Networking</h3>
+              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">Security & Networking</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Firewall configuration, DNS, DHCP, VPN, TCP/IP, network troubleshooting, and cybersecurity compliance frameworks.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-amber-500/30 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center mb-4">
-                <HardDrive className="w-5 h-5" />
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(245,158,11,0.18)] hover:-translate-y-1.5 transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300">
+                <HardDrive className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Datacenter Ops</h3>
+              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-amber-300 transition-colors">Datacenter Ops</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Hardware maintenance, RAID disk configuration, rack installations, network cabling, and disaster recovery execution.
               </p>
-            </div>
+            </motion.div>
           </div>
 
         </div>
@@ -907,8 +1036,14 @@ function SkillsMatrix() {
   return (
     <section id="skills" className="py-24 bg-[#0a0d16] border-t border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
             <Cpu className="w-3.5 h-3.5" />
             <span>EXPERT CAPABILITIES</span>
           </div>
@@ -918,32 +1053,36 @@ function SkillsMatrix() {
           <p className="text-slate-400 max-w-2xl mx-auto mt-3 text-sm sm:text-base">
             Detailed breakdown of technologies, platforms, and operational tools verified by production experience and certifications.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {skillCategories.map((group, idx) => (
-            <div
+            <motion.div
               key={idx}
-              className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-blue-500/40 hover:bg-slate-900 transition-all flex flex-col justify-between group"
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: idx * 0.06 }}
+              className="p-6 rounded-3xl bg-slate-900/50 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group"
             >
               <div>
                 <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-800/80">
-                  <div className="p-2.5 rounded-xl bg-slate-800 text-white group-hover:scale-110 transition-transform">
+                  <div className="p-2.5 rounded-2xl bg-slate-800 text-white group-hover:scale-110 group-hover:bg-blue-600/20 group-hover:border-blue-500/30 transition-all">
                     {group.icon}
                   </div>
-                  <h3 className="font-bold text-white text-base leading-snug">{group.category}</h3>
+                  <h3 className="font-bold text-white text-base leading-snug group-hover:text-blue-300 transition-colors">{group.category}</h3>
                 </div>
 
                 <ul className="space-y-2.5">
                   {group.skills.map((skill, sIdx) => (
-                    <li key={sIdx} className="text-xs text-slate-300 flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
+                    <li key={sIdx} className="text-xs text-slate-300 flex items-start gap-2 group-hover:text-slate-200 transition-colors">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0 group-hover:bg-cyan-400 transition-colors" />
                       <span className="leading-tight">{skill}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -995,8 +1134,14 @@ function CareerJourney() {
   return (
     <section id="career" className="py-24 bg-[#07090e] border-t border-slate-800/80">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
             <Briefcase className="w-3.5 h-3.5" />
             <span>CAREER PROGRESSION</span>
           </div>
@@ -1006,27 +1151,34 @@ function CareerJourney() {
           <p className="text-slate-400 max-w-2xl mx-auto mt-3 text-sm sm:text-base">
             Verifiable track record in production cloud systems, hypervisor management, and infrastructure automation.
           </p>
-        </div>
+        </motion.div>
 
         <div className="space-y-12 relative">
           {/* Vertical Guide Line */}
           <div className="hidden md:block absolute left-8 top-6 bottom-6 w-0.5 bg-gradient-to-b from-blue-500 via-indigo-500 to-transparent" />
 
           {experiences.map((exp, idx) => (
-            <div key={idx} className="relative md:pl-20">
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: idx * 0.15 }}
+              className="relative md:pl-20"
+            >
               {/* Timeline Indicator Dot */}
-              <div className="hidden md:flex absolute left-5 top-7 w-6 h-6 rounded-full bg-slate-900 border-2 border-blue-500 items-center justify-center -translate-x-1/2">
+              <div className="hidden md:flex absolute left-5 top-7 w-6 h-6 rounded-full bg-slate-900 border-2 border-blue-500 items-center justify-center -translate-x-1/2 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
                 <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
               </div>
 
-              <div className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/30 transition-all shadow-xl">
+              <div className="p-8 sm:p-10 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 hover:bg-slate-900 hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] hover:-translate-y-1 transition-all duration-300 shadow-xl">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-4 border-b border-slate-800">
                   <div>
-                    <span className="text-xs font-mono text-blue-400 uppercase tracking-wider">{exp.type}</span>
-                    <h3 className="text-2xl font-bold text-white">{exp.role}</h3>
-                    <div className="text-sm font-medium text-slate-300">{exp.company} • <span className="text-slate-500">{exp.location}</span></div>
+                    <span className="text-xs font-mono text-blue-400 uppercase tracking-wider font-semibold">{exp.type}</span>
+                    <h3 className="text-2xl font-bold text-white mt-0.5">{exp.role}</h3>
+                    <div className="text-sm font-medium text-slate-300 mt-1">{exp.company} • <span className="text-slate-500">{exp.location}</span></div>
                   </div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-950/60 border border-blue-800/60 text-blue-400 text-xs font-mono">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-blue-950/70 border border-blue-800/70 text-blue-400 text-xs font-mono font-medium shadow-md">
                     <Clock className="w-3.5 h-3.5" />
                     {exp.period}
                   </div>
@@ -1034,11 +1186,11 @@ function CareerJourney() {
 
                 <p className="text-sm text-slate-300 mb-6 italic">{exp.description}</p>
 
-                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3">Key Responsibilities & Deliverables:</h4>
+                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3 font-semibold">Key Responsibilities & Deliverables:</h4>
                 <ul className="space-y-2.5 mb-6">
                   {exp.achievements.map((item, aIdx) => (
                     <li key={aIdx} className="text-xs sm:text-sm text-slate-300 flex items-start gap-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 flex-shrink-0 shadow-sm" />
                       <span className="leading-relaxed">{item}</span>
                     </li>
                   ))}
@@ -1046,13 +1198,13 @@ function CareerJourney() {
 
                 <div className="pt-4 border-t border-slate-800 flex flex-wrap gap-2">
                   {exp.technologies.map((tech, tIdx) => (
-                    <span key={tIdx} className="px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700/60">
+                    <span key={tIdx} className="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700/60 hover:bg-blue-600/20 hover:text-blue-300 hover:border-blue-500/40 transition-all cursor-default">
                       {tech}
                     </span>
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -1067,11 +1219,17 @@ function DatacenterSection() {
   return (
     <section className="py-20 bg-[#0a0d16] border-t border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#0c1220] via-slate-900 to-[#0c1220] border border-blue-900/40 relative overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#0c1220] via-slate-900 to-[#0c1220] border border-blue-900/40 hover:border-blue-500/40 hover:shadow-[0_0_40px_rgba(59,130,246,0.18)] transition-all duration-300 relative overflow-hidden"
+        >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono mb-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono mb-4">
                 <Server className="w-3.5 h-3.5" />
                 <span>ON-PREM & VIRTUALIZATION ENGINE</span>
               </div>
@@ -1083,27 +1241,27 @@ function DatacenterSection() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm text-slate-300">
-                <div className="flex items-start gap-2.5">
+                <div className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-800/40 transition-colors">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <span>VM Provisioning & Capacity Planning</span>
                 </div>
-                <div className="flex items-start gap-2.5">
+                <div className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-800/40 transition-colors">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <span>RAID Configuration & Storage</span>
                 </div>
-                <div className="flex items-start gap-2.5">
+                <div className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-800/40 transition-colors">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <span>Hypervisor Patching & Upgrades</span>
                 </div>
-                <div className="flex items-start gap-2.5">
+                <div className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-800/40 transition-colors">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <span>Rack Installation & Network Cabling</span>
                 </div>
-                <div className="flex items-start gap-2.5">
+                <div className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-800/40 transition-colors">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <span>VM Snapshots & Disaster Recovery</span>
                 </div>
-                <div className="flex items-start gap-2.5">
+                <div className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-800/40 transition-colors">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                   <span>Server Deployment & Hardware Maint.</span>
                 </div>
@@ -1111,14 +1269,17 @@ function DatacenterSection() {
             </div>
 
             <div className="lg:col-span-5 flex justify-center">
-              <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800 w-full font-mono text-xs text-slate-300 space-y-3">
+              <div className="p-6 rounded-2xl bg-slate-950/90 border border-slate-800 hover:border-emerald-500/40 transition-colors w-full font-mono text-xs text-slate-300 space-y-3 shadow-2xl">
                 <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                  <span className="text-emerald-400 font-bold">ESXi Host Telemetry</span>
+                  <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    ESXi Host Telemetry
+                  </span>
                   <span className="text-slate-500">vSphere / ESXi 7.x/8.x</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Hypervisor State:</span>
-                  <span className="text-emerald-400">RUNNING (Healthy)</span>
+                  <span className="text-emerald-400 font-semibold">RUNNING (Healthy)</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Virtual Machines:</span>
@@ -1139,7 +1300,7 @@ function DatacenterSection() {
             </div>
 
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -1152,8 +1313,14 @@ function ProjectsSection() {
   return (
     <section id="projects" className="py-24 bg-[#07090e] border-t border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
             <Award className="w-3.5 h-3.5" />
             <span>PROVEN DELIVERABLES</span>
           </div>
@@ -1163,14 +1330,20 @@ function ProjectsSection() {
           <p className="text-slate-400 max-w-2xl mx-auto mt-3 text-sm sm:text-base">
             Applying engineering and AI to solve real-world security and data monitoring challenges.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="max-w-4xl mx-auto p-8 sm:p-10 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 transition-all shadow-2xl">
+        <motion.div 
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="max-w-4xl mx-auto p-8 sm:p-10 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_35px_rgba(59,130,246,0.18)] hover:-translate-y-1.5 transition-all duration-300 shadow-2xl"
+        >
           <div className="flex flex-wrap gap-2 mb-4">
-            <span className="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-mono">Python</span>
-            <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono">Machine Learning</span>
-            <span className="px-3 py-1 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-mono">Pandas & Scikit-learn</span>
-            <span className="px-3 py-1 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-mono">Anomaly Detection</span>
+            <span className="px-3 py-1 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-mono">Python</span>
+            <span className="px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono">Machine Learning</span>
+            <span className="px-3 py-1 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-mono">Pandas & Scikit-learn</span>
+            <span className="px-3 py-1 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-mono">Anomaly Detection</span>
           </div>
 
           <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">Women Safety Analytics</h3>
@@ -1179,21 +1352,27 @@ function ProjectsSection() {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
-              <div className="text-xs font-mono text-amber-400 font-bold mb-1">🏆 Smart India Hackathon (SIH)</div>
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 transition-colors">
+              <div className="text-xs font-mono text-amber-400 font-bold mb-1 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                Smart India Hackathon (SIH)
+              </div>
               <div className="text-xs text-slate-400">Awarded for innovative AI solution architecture and real-time threat analysis.</div>
             </div>
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
-              <div className="text-xs font-mono text-blue-400 font-bold mb-1">🤝 Madadgar Foundation</div>
+            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 transition-colors">
+              <div className="text-xs font-mono text-blue-400 font-bold mb-1 flex items-center gap-1.5">
+                <Award className="w-3.5 h-3.5" />
+                Madadgar Foundation
+              </div>
               <div className="text-xs text-slate-400">Delivered 5+ working social-impact prototypes applying technology to safety.</div>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-blue-950/30 border border-blue-900/50 flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-blue-950/30 border border-blue-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <span className="text-xs text-blue-300 font-medium">Winner: Hackwith Uttarakhand & SIH Awardee</span>
-            <span className="text-xs font-mono text-blue-400">Production Tested Prototype</span>
+            <span className="text-xs font-mono text-blue-400 bg-blue-900/40 px-3 py-1 rounded-lg border border-blue-800/60">Production Tested Prototype</span>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -1254,8 +1433,14 @@ function CertificationsSection({ onSelectCert }: { onSelectCert: (cert: any) => 
   return (
     <section id="certifications" className="py-24 bg-[#0a0d16] border-t border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
             <Shield className="w-3.5 h-3.5" />
             <span>VERIFIABLE CREDENTIALS</span>
           </div>
@@ -1263,33 +1448,37 @@ function CertificationsSection({ onSelectCert }: { onSelectCert: (cert: any) => 
             Professional Certifications
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto mt-3 text-sm sm:text-base">
-            Officially verified cloud, cybersecurity, and enterprise infrastructure credentials.
+            Officially verified cloud, cybersecurity, and enterprise infrastructure credentials. Click to view documents.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {certifications.map((cert, idx) => (
-            <div
+            <motion.div
               key={idx}
-              className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 transition-all flex flex-col justify-between group shadow-lg"
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: idx * 0.08 }}
+              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_35px_rgba(59,130,246,0.18)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group shadow-lg"
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-500/20 group-hover:scale-110 transition-transform">
+                  <div className="p-3 rounded-2xl bg-blue-600/10 text-blue-400 border border-blue-500/20 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                     <FileText className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                  <span className="text-[10px] font-mono px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
                     {cert.year}
                   </span>
                 </div>
 
                 <div className="text-xs font-mono text-blue-400 font-semibold mb-1">{cert.badge}</div>
-                <h3 className="font-bold text-white text-base leading-snug mb-2">{cert.name}</h3>
+                <h3 className="font-bold text-white text-base leading-snug mb-2 group-hover:text-blue-300 transition-colors">{cert.name}</h3>
                 <div className="text-xs text-slate-400 font-medium mb-3">Issued by {cert.issuer}</div>
                 <p className="text-xs text-slate-400 leading-relaxed mb-4">{cert.description}</p>
 
                 {cert.id && (
-                  <div className="p-2 rounded-lg bg-slate-950 text-[11px] font-mono text-slate-400 border border-slate-800/80 mb-4 flex items-center justify-between">
+                  <div className="p-2.5 rounded-xl bg-slate-950 text-[11px] font-mono text-slate-400 border border-slate-800/80 mb-4 flex items-center justify-between">
                     <span>ID:</span>
                     <span className="text-slate-200 font-semibold">{cert.id}</span>
                   </div>
@@ -1301,15 +1490,15 @@ function CertificationsSection({ onSelectCert }: { onSelectCert: (cert: any) => 
                   <>
                     <button
                       onClick={() => onSelectCert(cert)}
-                      className="flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 text-xs font-semibold transition-all hover:scale-105"
                     >
-                      <Eye className="w-3.5 h-3.5" /> View Certificate
+                      <Eye className="w-3.5 h-3.5" /> View PDF
                     </button>
                     <a
                       href={getAssetUrl(cert.file)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white transition-colors"
+                      className="p-2 rounded-lg bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white transition-all hover:scale-105"
                       title="Download PDF"
                     >
                       <Download className="w-3.5 h-3.5" />
@@ -1321,7 +1510,7 @@ function CertificationsSection({ onSelectCert }: { onSelectCert: (cert: any) => 
                   </span>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -1343,20 +1532,33 @@ function PhilosophySection() {
   return (
     <section className="py-20 bg-[#07090e] border-t border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
+        >
           <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Engineering Philosophy</h2>
           <p className="text-sm text-slate-400 mt-2">The fundamental architectural principles guiding every production deployment.</p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {pillars.map((p, idx) => (
-            <div key={idx} className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800/80 text-center">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-800 flex items-center justify-center mb-4">
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: idx * 0.08 }}
+              className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 hover:border-blue-500/40 hover:bg-slate-900/80 hover:-translate-y-1 transition-all duration-300 text-center group cursor-default"
+            >
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-800 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-600/20 transition-all duration-300">
                 {p.icon}
               </div>
-              <h3 className="font-bold text-white text-base mb-2">{p.title}</h3>
+              <h3 className="font-bold text-white text-base mb-2 group-hover:text-blue-300 transition-colors">{p.title}</h3>
               <p className="text-xs text-slate-400 leading-relaxed">{p.desc}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -1371,21 +1573,28 @@ function EducationSection() {
   return (
     <section id="education" className="py-20 bg-[#0a0d16] border-t border-slate-800/80">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-4">
-          <GraduationCap className="w-3.5 h-3.5" />
-          <span>ACADEMIC FOUNDATION</span>
-        </div>
-        
-        <div className="p-8 sm:p-10 rounded-3xl bg-slate-900/60 border border-slate-800 text-center">
-          <h3 className="text-2xl font-bold text-white mb-2">Bachelor of Technology in Computer Science and Engineering</h3>
-          <div className="text-blue-400 font-medium text-base mb-4">Nitra Technical Campus, Ghaziabad, UP</div>
-          <div className="inline-block px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-xs font-mono text-slate-300">
-            2022 — 2026 • Computer Science & Engineering
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-4">
+            <GraduationCap className="w-3.5 h-3.5" />
+            <span>ACADEMIC FOUNDATION</span>
           </div>
-          <p className="text-xs text-slate-400 mt-4 max-w-xl mx-auto">
-            Focus on Operating Systems, Computer Networks, Distributed Computing, Database Management Systems, and Cloud Architectures.
-          </p>
-        </div>
+          
+          <div className="p-8 sm:p-10 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] transition-all duration-300 text-center">
+            <h3 className="text-2xl font-bold text-white mb-2">Bachelor of Technology in Computer Science and Engineering</h3>
+            <div className="text-blue-400 font-semibold text-base mb-4">Nitra Technical Campus, Ghaziabad, UP</div>
+            <div className="inline-block px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-xs font-mono text-slate-300">
+              2022 — 2026 • Computer Science & Engineering
+            </div>
+            <p className="text-xs text-slate-400 mt-4 max-w-xl mx-auto leading-relaxed">
+              Focus on Operating Systems, Computer Networks, Distributed Computing, Database Management Systems, and Cloud Architectures.
+            </p>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -1400,64 +1609,71 @@ function ContactSection() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(37,99,235,0.08),transparent)] pointer-events-none" />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-800/60 text-blue-400 text-xs font-mono mb-6">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>OPEN FOR CLOUD & DEVOPS OPPORTUNITIES</span>
-        </div>
-
-        <h2 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-          Let's Build Something Reliable.
-        </h2>
-        <p className="text-slate-300 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
-          Looking for a dedicated Cloud & DevOps Engineer to design resilient infrastructure, automate CI/CD pipelines, or optimize your cloud costs?
-        </p>
-
-        {/* Direct Connect Buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
-          <a
-            href="mailto:7080dhiru@gmail.com"
-            className="flex items-center gap-2.5 px-7 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:shadow-[0_0_35px_rgba(59,130,246,0.6)]"
-          >
-            <Mail className="w-4 h-4" />
-            <span>7080dhiru@gmail.com</span>
-          </a>
-
-          <a
-            href="https://linkedin.com/in/abhishek-singh-4489ab265"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2.5 px-7 py-4 rounded-xl bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm transition-all shadow-lg shadow-blue-900/30"
-          >
-            <LinkedInIcon />
-            <span>Connect on LinkedIn</span>
-          </a>
-
-          <a
-            href="https://github.com/7080dhiru-star"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2.5 px-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold text-sm transition-colors"
-          >
-            <GitHubIcon />
-            <span>GitHub Profile</span>
-          </a>
-        </div>
-
-        {/* Info Badges */}
-        <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-mono">
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-emerald-400" />
-            <span>+91 9935953563</span>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/70 border border-blue-800/70 text-blue-400 text-xs font-mono mb-6 shadow-md">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>OPEN FOR CLOUD & DEVOPS OPPORTUNITIES</span>
           </div>
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-blue-400" />
-            <span>Ghaziabad, Uttar Pradesh, India</span>
+
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
+            Let's Build Something Reliable.
+          </h2>
+          <p className="text-slate-300 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+            Looking for a dedicated Cloud & DevOps Engineer to design resilient infrastructure, automate CI/CD pipelines, or optimize your cloud costs?
+          </p>
+
+          {/* Direct Connect Buttons with Rich Hover */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+            <a
+              href="mailto:7080dhiru@gmail.com"
+              className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.65)] hover:-translate-y-1"
+            >
+              <Mail className="w-4 h-4" />
+              <span>7080dhiru@gmail.com</span>
+            </a>
+
+            <a
+              href="https://linkedin.com/in/abhishek-singh-4489ab265"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-900/40 hover:-translate-y-1 hover:shadow-xl"
+            >
+              <LinkedInIcon />
+              <span>Connect on LinkedIn</span>
+            </a>
+
+            <a
+              href="https://github.com/7080dhiru-star"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 px-6 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-500 font-bold text-sm transition-all hover:-translate-y-1 shadow-md"
+            >
+              <GitHubIcon />
+              <span>GitHub Profile</span>
+            </a>
           </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-purple-400" />
-            <span>Immediate / High Availability</span>
+
+          {/* Info Badges */}
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-mono">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/50 border border-slate-800">
+              <Phone className="w-4 h-4 text-emerald-400" />
+              <span>+91 9935953563</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/50 border border-slate-800">
+              <MapPin className="w-4 h-4 text-blue-400" />
+              <span>Ghaziabad, Uttar Pradesh, India</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/50 border border-slate-800">
+              <CheckCircle2 className="w-4 h-4 text-purple-400" />
+              <span>Immediate Availability</span>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -1503,14 +1719,14 @@ function CertificateModal({ cert, onClose }: { cert: { name: string; issuer: str
       >
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-colors"
+          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-colors hover:scale-105"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 rounded-xl bg-blue-600/20 text-blue-400">
+          <div className="p-3 rounded-2xl bg-blue-600/20 text-blue-400">
             <Shield className="w-6 h-6" />
           </div>
           <div>
@@ -1529,7 +1745,7 @@ function CertificateModal({ cert, onClose }: { cert: { name: string; issuer: str
         {/* Embedded PDF or Verification View */}
         {pdfUrl ? (
           <div className="space-y-4">
-            <div className="w-full h-80 sm:h-96 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center relative">
+            <div className="w-full h-80 sm:h-96 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center relative shadow-inner">
               <iframe
                 src={`${pdfUrl}#toolbar=0`}
                 title={cert.name}
@@ -1542,14 +1758,14 @@ function CertificateModal({ cert, onClose }: { cert: { name: string; issuer: str
                 href={pdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition-all hover:scale-105"
               >
                 <ExternalLink className="w-4 h-4" /> Open Fullscreen PDF
               </a>
               <a
                 href={pdfUrl}
                 download
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all hover:scale-105"
               >
                 <Download className="w-4 h-4" /> Download Certificate
               </a>
