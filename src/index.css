@@ -1,12 +1,27 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  body {
-    @apply bg-background text-textMain antialiased selection:bg-primary/30 selection:text-primary;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
+@theme {
+  --color-background: #0a0a0f;
+  --color-surface: #111116;
+  --color-primary: #3b82f6;
+  --color-secondary: #1e293b;
+  --color-textMain: #f8fafc;
+  --color-textMuted: #94a3b8;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "Fira Code", monospace;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-textMain);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+::selection {
+  background-color: rgba(59, 130, 246, 0.3);
+  color: var(--color-primary);
 }
 
 html {
@@ -14,5 +29,8 @@ html {
 }
 
 .glass-panel {
-  @apply bg-surface/80 backdrop-blur-md border border-white/5 shadow-xl;
+  background-color: rgba(17, 17, 22, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
