@@ -17,7 +17,7 @@ const getAssetUrl = (filename: string) => {
   return `${base}${filename.replace(/^\//, '')}`;
 };
 
-// Social Icons as SVGs for reliability
+// Social Icons as SVGs
 const LinkedInIcon = () => (
   <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
     <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.22a1.6 1.6 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0-1.6-1.6Z" />
@@ -31,11 +31,13 @@ const GitHubIcon = () => (
 );
 
 // ----------------------------------------------------
-// OpenAI Astra-Inspired Fluid Global Cursor Aura (Zero Re-render Physics Loop)
+// 01 — GLOBAL INTERACTION ENGINE & CONTEXTUAL CURSOR
 // ----------------------------------------------------
-function GlobalCursorAura() {
+function SystemCursorEngine() {
   const dotRef = useRef<HTMLDivElement | null>(null);
   const haloRef = useRef<HTMLDivElement | null>(null);
+  const contextBadgeRef = useRef<HTMLDivElement | null>(null);
+  const trailRefs = [useRef<HTMLDivElement | null>(null), useRef<HTMLDivElement | null>(null), useRef<HTMLDivElement | null>(null)];
 
   useEffect(() => {
     // Disable on mobile/touch screens and reduced-motion preferences
@@ -47,11 +49,26 @@ function GlobalCursorAura() {
       return;
     }
 
-    const mouse = { x: -100, y: -100, targetX: -100, targetY: -100, isHovering: false, isDown: false, isVisible: false };
+    const mouse = {
+      targetX: -100,
+      targetY: -100,
+      isDown: false,
+      isVisible: false,
+      contextState: 'DEFAULT' as 'DEFAULT' | 'BUTTON' | 'PROJECT' | 'EXTERNAL' | 'CARD'
+    };
+
     let currentX = -100;
     let currentY = -100;
     let dotX = -100;
     let dotY = -100;
+    
+    // Trail history points
+    const history = [
+      { x: -100, y: -100 },
+      { x: -100, y: -100 },
+      { x: -100, y: -100 }
+    ];
+
     let animId: number;
 
     const onMouseMove = (e: MouseEvent) => {
@@ -61,8 +78,17 @@ function GlobalCursorAura() {
 
       const target = e.target as HTMLElement | null;
       if (target) {
-        const interactive = target.closest('button, a, input, [data-magnetic], [data-interactive], .astra-card, [role="button"]');
-        mouse.isHovering = !!interactive;
+        if (target.closest('[data-cursor="project"]')) {
+          mouse.contextState = 'PROJECT';
+        } else if (target.closest('[data-cursor="external"]')) {
+          mouse.contextState = 'EXTERNAL';
+        } else if (target.closest('button, a, [data-magnetic="true"], [data-cursor="button"], [role="button"]')) {
+          mouse.contextState = 'BUTTON';
+        } else if (target.closest('.sys-card, [data-cursor="card"]')) {
+          mouse.contextState = 'CARD';
+        } else {
+          mouse.contextState = 'DEFAULT';
+        }
       }
     };
 
@@ -79,33 +105,93 @@ function GlobalCursorAura() {
 
     const render = () => {
       if (mouse.isVisible) {
-        // Fluid Lerp Interpolation
-        currentX += (mouse.targetX - currentX) * 0.14;
-        currentY += (mouse.targetY - currentY) * 0.14;
-        dotX += (mouse.targetX - dotX) * 0.48;
-        dotY += (mouse.targetY - dotY) * 0.48;
+        // High-precision fluid lerp
+        currentX += (mouse.targetX - currentX) * 0.16;
+        currentY += (mouse.targetY - currentY) * 0.16;
+        dotX += (mouse.targetX - dotX) * 0.52;
+        dotY += (mouse.targetY - dotY) * 0.52;
 
+        // Velocity and direction vector
         const vx = mouse.targetX - currentX;
         const vy = mouse.targetY - currentY;
-        const speed = Math.min(Math.hypot(vx, vy) * 0.003, 0.25);
+        const speed = Math.hypot(vx, vy);
+        const stretch = Math.min(speed * 0.004, 0.35);
+        const angle = Math.atan2(vy, vx) * (180 / Math.PI);
 
+        // Update trail points with decaying delay
+        history[0].x += (currentX - history[0].x) * 0.28;
+        history[0].y += (currentY - history[0].y) * 0.28;
+        history[1].x += (history[0].x - history[1].x) * 0.25;
+        history[1].y += (history[0].y - history[1].y) * 0.25;
+        history[2].x += (history[1].x - history[2].x) * 0.22;
+        history[2].y += (history[1].y - history[2].y) * 0.22;
+
+        // Update Core Dot
         if (dotRef.current) {
-          dotRef.current.style.transform = `translate3d(${dotX}px, ${dotY}px, 0) translate(-50%, -50%) scale(${mouse.isDown ? 0.75 : 1})`;
+          dotRef.current.style.transform = `translate3d(${dotX}px, ${dotY}px, 0) translate(-50%, -50%) scale(${mouse.isDown ? 0.7 : 1})`;
           dotRef.current.style.opacity = '1';
         }
 
+        // Update Ambient Luminous Halo with Contextual Transform
         if (haloRef.current) {
-          const scale = mouse.isHovering ? 1.45 : mouse.isDown ? 0.85 : 1.0;
-          haloRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%) scale(${scale + speed})`;
-          haloRef.current.style.opacity = mouse.isHovering ? '0.95' : '0.7';
-          haloRef.current.style.borderColor = mouse.isHovering ? 'rgba(96, 165, 250, 0.4)' : 'rgba(59, 130, 246, 0.2)';
-          haloRef.current.style.boxShadow = mouse.isHovering 
-            ? '0 0 25px rgba(59, 130, 246, 0.35), inset 0 0 15px rgba(59, 130, 246, 0.15)' 
-            : '0 0 12px rgba(59, 130, 246, 0.15)';
+          let scale = 1.0;
+          let ringColor = 'rgba(59, 130, 246, 0.25)';
+          let glowShadow = '0 0 12px rgba(59, 130, 246, 0.15)';
+
+          if (mouse.contextState === 'BUTTON') {
+            scale = 1.45;
+            ringColor = 'rgba(96, 165, 250, 0.5)';
+            glowShadow = '0 0 24px rgba(59, 130, 246, 0.35), inset 0 0 12px rgba(59, 130, 246, 0.2)';
+          } else if (mouse.contextState === 'PROJECT') {
+            scale = 1.6;
+            ringColor = 'rgba(16, 185, 129, 0.5)';
+            glowShadow = '0 0 24px rgba(16, 185, 129, 0.35)';
+          } else if (mouse.contextState === 'CARD') {
+            scale = 1.15;
+            ringColor = 'rgba(147, 197, 253, 0.35)';
+          }
+
+          if (speed > 8) {
+            haloRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%) rotate(${angle}deg) scale(${scale + stretch}, ${Math.max(0.7, scale - stretch * 0.5)})`;
+          } else {
+            haloRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%) scale(${scale})`;
+          }
+
+          haloRef.current.style.opacity = '1';
+          haloRef.current.style.borderColor = ringColor;
+          haloRef.current.style.boxShadow = glowShadow;
         }
+
+        // Context Badge Display
+        if (contextBadgeRef.current) {
+          if (mouse.contextState === 'PROJECT') {
+            contextBadgeRef.current.style.transform = `translate3d(${currentX + 16}px, ${currentY + 16}px, 0)`;
+            contextBadgeRef.current.style.opacity = '1';
+            contextBadgeRef.current.innerText = 'NODE::EXPLORE';
+          } else if (mouse.contextState === 'EXTERNAL') {
+            contextBadgeRef.current.style.transform = `translate3d(${currentX + 14}px, ${currentY + 14}px, 0)`;
+            contextBadgeRef.current.style.opacity = '1';
+            contextBadgeRef.current.innerText = '↗';
+          } else {
+            contextBadgeRef.current.style.opacity = '0';
+          }
+        }
+
+        // Motion Residue Trail (subtle 3-point signal tracer)
+        trailRefs.forEach((tRef, idx) => {
+          if (tRef.current && speed > 5) {
+            tRef.current.style.transform = `translate3d(${history[idx].x}px, ${history[idx].y}px, 0) translate(-50%, -50%)`;
+            tRef.current.style.opacity = `${0.35 - idx * 0.1}`;
+          } else if (tRef.current) {
+            tRef.current.style.opacity = '0';
+          }
+        });
+
       } else {
         if (dotRef.current) dotRef.current.style.opacity = '0';
         if (haloRef.current) haloRef.current.style.opacity = '0';
+        if (contextBadgeRef.current) contextBadgeRef.current.style.opacity = '0';
+        trailRefs.forEach(tRef => { if (tRef.current) tRef.current.style.opacity = '0'; });
       }
 
       animId = requestAnimationFrame(render);
@@ -125,29 +211,39 @@ function GlobalCursorAura() {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden select-none">
-      {/* Precision Core Dot */}
+      {/* Precision Reticle Core */}
       <div
         ref={dotRef}
-        className="fixed top-0 left-0 w-2 h-2 rounded-full bg-blue-300 shadow-[0_0_10px_#93c5fd] pointer-events-none transition-opacity duration-300"
+        className="fixed top-0 left-0 w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_8px_#38bdf8] pointer-events-none transition-opacity duration-300"
         style={{ opacity: 0 }}
       />
-      {/* Ambient Fluid Luminous Aura */}
+      {/* Ambient Fluid Luminous Field */}
       <div
         ref={haloRef}
-        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-blue-400/25 bg-blue-500/10 backdrop-blur-[0.5px] pointer-events-none transition-opacity duration-300"
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-blue-400/30 bg-blue-500/10 pointer-events-none transition-opacity duration-300"
         style={{ opacity: 0 }}
       />
+      {/* Contextual System Metadata Badge */}
+      <div
+        ref={contextBadgeRef}
+        className="fixed top-0 left-0 px-2 py-0.5 rounded-md bg-slate-950/90 border border-blue-500/40 text-[9px] font-mono text-cyan-300 font-semibold tracking-wider pointer-events-none transition-opacity duration-200 shadow-xl"
+        style={{ opacity: 0 }}
+      />
+      {/* Temporal Motion Residue Tracers */}
+      <div ref={trailRefs[0]} className="fixed top-0 left-0 w-1.5 h-1.5 rounded-full bg-blue-400/40 pointer-events-none" style={{ opacity: 0 }} />
+      <div ref={trailRefs[1]} className="fixed top-0 left-0 w-1.5 h-1.5 rounded-full bg-blue-400/25 pointer-events-none" style={{ opacity: 0 }} />
+      <div ref={trailRefs[2]} className="fixed top-0 left-0 w-1 h-1 rounded-full bg-blue-400/15 pointer-events-none" style={{ opacity: 0 }} />
     </div>
   );
 }
 
 // ----------------------------------------------------
-// Reusable Magnetic Attraction Component for CTA & Action Buttons
+// 02 — PHYSICAL MAGNETIC ATTRACTION FIELD
 // ----------------------------------------------------
-function Magnetic({
+function SystemMagnetic({
   children,
   className = '',
-  strength = 0.22,
+  strength = 0.24,
   maxDisplacement = 8
 }: {
   children: React.ReactNode;
@@ -228,21 +324,22 @@ function Magnetic({
   }, [strength, maxDisplacement]);
 
   return (
-    <div ref={elRef} data-magnetic="true" className={`magnetic-btn inline-block ${className}`}>
+    <div ref={elRef} data-magnetic="true" data-cursor="button" className={`sys-magnetic inline-block ${className}`}>
       {children}
     </div>
   );
 }
 
 // ----------------------------------------------------
-// Reusable Multi-Layer OpenAI Astra Interactive 3D Card
+// 03 — PHYSICAL SYSTEM CARD WITH SURFACE LIGHTING & ENERGY EDGES
 // ----------------------------------------------------
-function AstraCard({
+function SystemCard({
   children,
   className = '',
   tilt = true,
   maxTilt = 3.2,
   maxTranslate = 4,
+  cursorType = 'card',
   onClick,
   onMouseEnter,
   onMouseLeave
@@ -252,6 +349,7 @@ function AstraCard({
   tilt?: boolean;
   maxTilt?: number;
   maxTranslate?: number;
+  cursorType?: string;
   onClick?: () => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
@@ -295,7 +393,7 @@ function AstraCard({
     const onMouseEnterCard = () => {
       isHovered = true;
       card.style.setProperty('--spotlight-opacity', '1');
-      card.style.setProperty('--border-opacity', '1');
+      card.style.setProperty('--border-energy', '1');
       startAnimation();
     };
 
@@ -306,7 +404,7 @@ function AstraCard({
       targetTransX = 0;
       targetTransY = 0;
       card.style.setProperty('--spotlight-opacity', '0');
-      card.style.setProperty('--border-opacity', '0');
+      card.style.setProperty('--border-energy', '0');
     };
 
     const tick = () => {
@@ -353,27 +451,32 @@ function AstraCard({
   return (
     <div
       ref={cardRef}
+      data-cursor={cursorType}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={`astra-card overflow-hidden ${className}`}
+      className={`sys-card overflow-hidden ${className}`}
     >
-      {/* Layer 2: Radial Spotlight Light */}
-      <div className="astra-spotlight-layer" />
-      {/* Layer 3: Dynamic Cursor Border Glow */}
-      <div className="astra-border-glow-layer" />
-      {/* Layer 4: Content Parallax Layer */}
-      <div className="astra-card-content flex flex-col justify-between">
+      {/* Virtual Flashlight Radial Spotlight */}
+      <div className="sys-spotlight-layer" />
+      {/* Dynamic Cursor Point Energy Perimeter */}
+      <div className="sys-border-energy-layer" />
+      {/* Content Depth Parallax */}
+      <div className="sys-card-content flex flex-col justify-between">
         {children}
       </div>
     </div>
   );
 }
 
+// Aliases for unified interaction components
+const Magnetic = SystemMagnetic;
+const AstraCard = SystemCard;
+
 // ----------------------------------------------------
-// Pro Cloud Services Video & Cyber Infrastructure Background
+// 04 — INTERACTIVE INFRASTRUCTURE TOPOLOGY BACKGROUND
 // ----------------------------------------------------
-function CloudServicesBackground({ 
+function InfrastructureTopologyBackground({ 
   isVideoPlaying, 
   showVideoOverlay 
 }: { 
@@ -382,7 +485,6 @@ function CloudServicesBackground({
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [videoError, setVideoError] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -411,7 +513,7 @@ function CloudServicesBackground({
     };
     window.addEventListener('resize', handleResize);
 
-    let mouse = { x: width / 2, y: height / 2, active: false };
+    const mouse = { x: width / 2, y: height / 2, active: false };
     const handleMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
@@ -419,7 +521,11 @@ function CloudServicesBackground({
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    const nodeLabels = ['AWS::VPC', 'GCP::AlloyDB', 'VMware::ESXi', 'K8s::Cluster', 'Ubuntu::Prod', 'CI/CD::Runner', 'AWS::RDS', 'Cloudflare::DNS', 'Fortinet::IAM'];
+    const topologyLabels = [
+      'AWS::VPC', 'GCP::AlloyDB', 'VMware::ESXi', 'K8s::Cluster', 
+      'Ubuntu::Prod', 'CI/CD::Runner', 'AWS::RDS', 'ZeroTrust::IAM', 'Fortinet::Edge'
+    ];
+    
     const nodes: Array<{
       x: number;
       y: number;
@@ -427,21 +533,19 @@ function CloudServicesBackground({
       vy: number;
       radius: number;
       label: string;
-      pulse: number;
       color: string;
     }> = [];
 
-    const colors = ['#38bdf8', '#3b82f6', '#10b981', '#a855f7', '#06b6d4'];
+    const colors = ['#38bdf8', '#3b82f6', '#10b981', '#6366f1', '#06b6d4'];
 
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 24; i++) {
       nodes.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.45,
-        radius: Math.random() * 2.5 + 2,
-        label: nodeLabels[i % nodeLabels.length],
-        pulse: Math.random() * Math.PI * 2,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        radius: Math.random() * 2 + 2,
+        label: topologyLabels[i % topologyLabels.length],
         color: colors[i % colors.length]
       });
     }
@@ -453,32 +557,31 @@ function CloudServicesBackground({
       ctx.clearRect(0, 0, width, height);
 
       const horizonY = height * 0.45;
-      ctx.strokeStyle = 'rgba(30, 58, 138, 0.12)';
+      ctx.strokeStyle = 'rgba(30, 58, 138, 0.08)';
       ctx.lineWidth = 1;
 
-      const vanishX = width * 0.5 + (mouse.x - width / 2) * 0.05;
-      for (let x = -width * 0.5; x <= width * 1.5; x += width * 0.1) {
+      // Perspective Grid Lines
+      const vanishX = width * 0.5 + (mouse.x - width / 2) * 0.04;
+      for (let x = -width * 0.5; x <= width * 1.5; x += width * 0.12) {
         ctx.beginPath();
         ctx.moveTo(vanishX, horizonY);
         ctx.lineTo(x, height);
         ctx.stroke();
       }
 
-      const gridOffset = (frame * 0.4) % 40;
+      const gridOffset = (frame * 0.35) % 40;
       for (let y = horizonY + gridOffset; y < height; y += 40) {
-        const factor = (y - horizonY) / (height - horizonY);
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
-        ctx.strokeStyle = `rgba(59, 130, 246, ${0.03 + factor * 0.09})`;
         ctx.stroke();
       }
 
+      // Draw Connected Topology Conduits
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         n.x += n.vx;
         n.y += n.vy;
-        n.pulse += 0.03;
 
         if (n.x < 0 || n.x > width) n.vx *= -1;
         if (n.y < 0 || n.y > height) n.vy *= -1;
@@ -487,50 +590,41 @@ function CloudServicesBackground({
         const dy = mouse.y - n.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 180 && mouse.active) {
-          n.x -= (dx / dist) * 0.6;
-          n.y -= (dy / dist) * 0.6;
+          n.x -= (dx / dist) * 0.5;
+          n.y -= (dy / dist) * 0.5;
         }
 
-        for (let j = i + 1; j < nodes.length; j++) {
-          const n2 = nodes[j];
-          const dist2 = Math.hypot(n.x - n2.x, n.y - n2.y);
-          if (dist2 < 170) {
-            const alpha = (1 - dist2 / 170) * 0.22;
-            ctx.beginPath();
-            ctx.moveTo(n.x, n.y);
-            ctx.lineTo(n2.x, n2.y);
-            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            if ((frame + i * 10) % 120 === 0) {
-              const packetPos = ((frame * 0.02) % 1);
-              const px = n.x + (n2.x - n.x) * packetPos;
-              const py = n.y + (n2.y - n.y) * packetPos;
-              ctx.beginPath();
-              ctx.arc(px, py, 1.8, 0, Math.PI * 2);
-              ctx.fillStyle = '#38bdf8';
-              ctx.shadowColor = '#38bdf8';
-              ctx.shadowBlur = 6;
-              ctx.fill();
-              ctx.shadowBlur = 0;
-            }
-          }
-        }
-
+        // Draw node
         ctx.beginPath();
-        const pulseSize = n.radius + Math.sin(n.pulse) * 0.8;
-        ctx.arc(n.x, n.y, pulseSize, 0, Math.PI * 2);
-        ctx.fillStyle = n.color;
-        ctx.shadowColor = n.color;
-        ctx.shadowBlur = 10;
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fillStyle = dist < 140 ? '#38bdf8' : n.color;
+        ctx.shadowBlur = dist < 140 ? 10 : 0;
+        ctx.shadowColor = '#38bdf8';
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        if (i % 3 === 0) {
-          ctx.font = '9px monospace';
-          ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
+        // Label on nearby nodes
+        if (dist < 150) {
+          ctx.font = '9px "Fira Code", monospace';
+          ctx.fillStyle = 'rgba(147, 197, 253, 0.8)';
           ctx.fillText(n.label, n.x + 8, n.y + 3);
+        }
+
+        // Connect nearby nodes
+        for (let j = i + 1; j < nodes.length; j++) {
+          const n2 = nodes[j];
+          const ndx = n.x - n2.x;
+          const ndy = n.y - n2.y;
+          const nDist = Math.sqrt(ndx * ndx + ndy * ndy);
+
+          if (nDist < 160) {
+            const alpha = (1 - nDist / 160) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(n.x, n.y);
+            ctx.lineTo(n2.x, n2.y);
+            ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+            ctx.stroke();
+          }
         }
       }
 
@@ -548,7 +642,7 @@ function CloudServicesBackground({
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
-      {showVideoOverlay && !videoError && (
+      {showVideoOverlay && (
         <div className="absolute inset-0 z-0">
           <video
             ref={videoRef}
@@ -556,12 +650,9 @@ function CloudServicesBackground({
             loop
             muted
             playsInline
-            onError={() => setVideoError(true)}
-            className="w-full h-full object-cover object-center opacity-30 mix-blend-screen scale-105 transition-opacity duration-1000"
+            className="w-full h-full object-cover object-center opacity-25 mix-blend-screen scale-105 transition-opacity duration-1000"
           >
             <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-graphs-and-data-31913-large.mp4" type="video/mp4" />
-            <source src="https://assets.mixkit.co/videos/preview/mixkit-futuristic-technology-digital-interface-31912-large.mp4" type="video/mp4" />
-            <source src={getAssetUrl('cloud-bg.mp4')} type="video/mp4" />
           </video>
         </div>
       )}
@@ -571,9 +662,9 @@ function CloudServicesBackground({
         className="absolute inset-0 w-full h-full opacity-65 z-[1]"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07090e]/85 via-[#07090e]/75 to-[#07090e] z-[2]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_30%,transparent_20%,#07090e_90%)] z-[2]" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-25 z-[3]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#05070c]/90 via-[#05070c]/80 to-[#05070c] z-[2]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_30%,transparent_20%,#05070c_90%)] z-[2]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px] opacity-25 z-[3]" />
     </div>
   );
 }
@@ -661,6 +752,48 @@ function CloudTopologyDiagram({ type }: { type: string }) {
           <span>Hypervisor CPU: <strong className="text-emerald-400">18.4%</strong></span>
           <span>Datastore: <strong className="text-cyan-400">RAID-10 Optimal</strong></span>
           <span>DR Snapshots: <strong className="text-white">Active</strong></span>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === 'sih-ai') {
+    return (
+      <div className="p-4 rounded-2xl bg-slate-950/80 border border-blue-900/40 relative overflow-hidden flex flex-col gap-3">
+        <div className="flex items-center justify-between text-[11px] font-mono text-blue-400 border-b border-slate-800 pb-2">
+          <span className="flex items-center gap-1.5 font-bold">
+            <Activity className="w-3.5 h-3.5 text-cyan-400 animate-pulse" /> AI Threat Telemetry & Anomaly Conduit
+          </span>
+          <span className="text-emerald-400 font-bold">● 96.4% Accuracy</span>
+        </div>
+
+        <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-mono py-2">
+          <div className="p-2.5 rounded-xl bg-blue-950/40 border border-blue-800/50 flex flex-col items-center">
+            <Radio className="w-4 h-4 text-cyan-400 mb-1 animate-pulse" />
+            <span className="text-white font-semibold">Sensor Ingest</span>
+            <span className="text-slate-500 text-[9px]">Raw Telemetry</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-blue-950/40 border border-blue-800/50 flex flex-col items-center">
+            <Cpu className="w-4 h-4 text-indigo-400 mb-1" />
+            <span className="text-white font-semibold">Scikit-Learn</span>
+            <span className="text-slate-500 text-[9px]">Feature Matrix</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-blue-950/40 border border-blue-800/50 flex flex-col items-center">
+            <Shield className="w-4 h-4 text-amber-400 mb-1" />
+            <span className="text-white font-semibold">Threat Model</span>
+            <span className="text-slate-500 text-[9px]">Anomaly Filter</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-blue-950/40 border border-blue-800/50 flex flex-col items-center">
+            <Zap className="w-4 h-4 text-emerald-400 mb-1 animate-bounce" />
+            <span className="text-white font-semibold">Madadgar Node</span>
+            <span className="text-slate-500 text-[9px]">Alert Dispatch</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-800">
+          <span>Model Inference: <strong className="text-emerald-400">18ms Latency</strong></span>
+          <span>Prototypes: <strong className="text-cyan-400">5+ Deployed</strong></span>
+          <span>Award: <strong className="text-amber-400">SIH Winner</strong></span>
         </div>
       </div>
     );
@@ -802,14 +935,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 font-sans selection:bg-blue-500/30 selection:text-blue-300 relative overflow-x-hidden">
-      <GlobalCursorAura />
+      <SystemCursorEngine />
 
       <div 
         className="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-blue-500 via-cyan-400 to-indigo-500 z-[100] transition-all duration-150"
         style={{ width: `${scrollProgress}%` }}
       />
 
-      <CloudServicesBackground 
+      <InfrastructureTopologyBackground 
         isVideoPlaying={isVideoPlaying} 
         showVideoOverlay={showVideoOverlay}
       />
@@ -842,7 +975,7 @@ export default function App() {
 
       <AnimatePresence>
         {showBackToTop && (
-          <Magnetic className="fixed bottom-6 right-6 z-40">
+          <SystemMagnetic className="fixed bottom-6 right-6 z-40">
             <motion.button
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -853,7 +986,7 @@ export default function App() {
             >
               <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
             </motion.button>
-          </Magnetic>
+          </SystemMagnetic>
         )}
       </AnimatePresence>
 
@@ -2517,7 +2650,7 @@ function ProjectsSection() {
             exit={{ opacity: 0, x: -25 }}
             transition={{ duration: 0.35 }}
           >
-            <AstraCard className="max-w-4xl mx-auto p-8 sm:p-12 shadow-2xl">
+            <AstraCard className="max-w-4xl mx-auto p-8 sm:p-12 shadow-2xl" cursorType="project">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                 <span className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-semibold border ${activeProject.badgeColor}`}>
                   {activeProject.category}
@@ -2534,9 +2667,14 @@ function ProjectsSection() {
                 {activeProject.tagline}
               </p>
 
-              <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-8">
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
                 {activeProject.description}
               </p>
+
+              {/* Dynamic Engineering Architecture Flow Diagram */}
+              <div className="mb-8">
+                <CloudTopologyDiagram type={projectSlide === 0 ? 'sih-ai' : projectSlide === 1 ? 'ch-aws' : 'ch-vmware'} />
+              </div>
 
               <div className="mb-8 space-y-2.5">
                 <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold mb-2">Key Outcomes:</div>

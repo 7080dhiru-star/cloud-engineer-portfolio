@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #07090e;
-  --color-surface: #0e131f;
+  --color-background: #05070c;
+  --color-surface: #0a0e1a;
+  --color-surfaceElevated: #0f1626;
   --color-primary: #3b82f6;
   --color-secondary: #1e293b;
   --color-textMain: #f8fafc;
@@ -11,12 +12,25 @@
   --font-mono: "Fira Code", monospace;
 }
 
+:root {
+  --sys-bg: #05070c;
+  --sys-surface: #0a0e1a;
+  --sys-surface-elevated: #0f1626;
+  --sys-border: rgba(30, 41, 59, 0.85);
+  --sys-border-active: rgba(59, 130, 246, 0.6);
+  --sys-signal-blue: #3b82f6;
+  --sys-signal-cyan: #06b6d4;
+  --sys-signal-emerald: #10b981;
+  --sys-signal-amber: #f59e0b;
+}
+
 body {
   background-color: var(--color-background);
   color: var(--color-textMain);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "rlig" 1, "calt" 1;
+  overflow-x: hidden;
 }
 
 ::selection {
@@ -29,56 +43,56 @@ html {
 }
 
 /* ----------------------------------------------------
-   OpenAI Astra-Inspired Fluid Multi-Layer Card System
+   System Card Model with Physical Surface Lighting & Energy Perimeter
    ---------------------------------------------------- */
-.astra-card {
+.sys-card {
   --mouse-x: 50%;
   --mouse-y: 50%;
   --spotlight-opacity: 0;
-  --border-opacity: 0;
+  --border-energy: 0;
   position: relative;
-  border-radius: 1.5rem;
-  background-color: rgba(14, 19, 31, 0.75);
+  border-radius: 1.25rem;
+  background-color: rgba(10, 14, 26, 0.78);
   border: 1px solid rgba(30, 41, 59, 0.85);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
   will-change: transform;
   transform-style: preserve-3d;
   transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.astra-card:hover {
-  box-shadow: 0 20px 40px -15px rgba(2, 6, 23, 0.8), 0 0 25px -5px rgba(59, 130, 246, 0.15);
+.sys-card:hover {
+  box-shadow: 0 24px 48px -12px rgba(2, 6, 23, 0.9), 0 0 30px -5px rgba(59, 130, 246, 0.2);
 }
 
-/* Internal Radial Spotlight Layer */
-.astra-spotlight-layer {
+/* Internal Radial Spotlight Virtual Flashlight */
+.sys-spotlight-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
   opacity: var(--spotlight-opacity, 0);
-  transition: opacity 0.35s ease-out;
+  transition: opacity 0.3s ease-out;
   background: radial-gradient(
-    480px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(59, 130, 246, 0.11),
-    rgba(14, 165, 233, 0.04) 45%,
+    520px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(59, 130, 246, 0.12),
+    rgba(6, 182, 212, 0.04) 45%,
     transparent 80%
   );
   z-index: 1;
 }
 
-/* Dynamic Border Highlight Layer (Lights up right at cursor entry point) */
-.astra-border-glow-layer {
+/* Dynamic Energy Border Beam (illuminates precisely along cursor entry coordinate) */
+.sys-border-energy-layer {
   position: absolute;
   inset: -1px;
   pointer-events: none;
   border-radius: inherit;
-  opacity: var(--border-opacity, 0);
-  transition: opacity 0.35s ease-out;
+  opacity: var(--border-energy, 0);
+  transition: opacity 0.3s ease-out;
   background: radial-gradient(
-    280px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(147, 197, 253, 0.55),
-    rgba(59, 130, 246, 0.25) 35%,
+    320px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(147, 197, 253, 0.65),
+    rgba(59, 130, 246, 0.3) 35%,
     transparent 75%
   );
   z-index: 2;
@@ -89,8 +103,8 @@ html {
   padding: 1px;
 }
 
-/* Content Parallax Container */
-.astra-card-content {
+/* Content Depth Parallax Container */
+.sys-card-content {
   position: relative;
   z-index: 10;
   width: 100%;
@@ -98,8 +112,8 @@ html {
   transform-style: preserve-3d;
 }
 
-/* Magnetic Button Subtle Internal Light Reflection */
-.magnetic-btn {
+/* Magnetic Physical Response */
+.sys-magnetic {
   --mouse-x: 50%;
   --mouse-y: 50%;
   position: relative;
@@ -107,7 +121,7 @@ html {
   will-change: transform;
 }
 
-.magnetic-btn::before {
+.sys-magnetic::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -116,28 +130,59 @@ html {
   transition: opacity 0.3s ease;
   background: radial-gradient(
     140px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.18),
     transparent 70%
   );
 }
 
-.magnetic-btn:hover::before {
+.sys-magnetic:hover::before {
   opacity: 1;
+}
+
+/* Data Flow Conduit Signal Pulses */
+@keyframes signalFlow {
+  0% {
+    stroke-dashoffset: 200;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-signal-flow {
+  stroke-dasharray: 8 16;
+  animation: signalFlow 2.5s linear infinite;
+}
+
+.animate-signal-flow-fast {
+  stroke-dasharray: 6 12;
+  animation: signalFlow 1.4s linear infinite;
+}
+
+/* System Grid Texture */
+.sys-grid-pattern {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 /* Reduced Motion and Touch Devices Fallbacks */
 @media (prefers-reduced-motion: reduce) {
-  .astra-card,
-  .magnetic-btn,
-  .astra-spotlight-layer,
-  .astra-border-glow-layer {
+  .sys-card,
+  .sys-magnetic,
+  .sys-spotlight-layer,
+  .sys-border-energy-layer,
+  .animate-signal-flow,
+  .animate-signal-flow-fast {
     transition: none !important;
     transform: none !important;
+    animation: none !important;
   }
 }
 
 @media (pointer: coarse) {
-  .astra-card {
+  .sys-card {
     transform: none !important;
   }
 }
+
