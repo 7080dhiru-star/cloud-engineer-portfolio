@@ -20,7 +20,7 @@ const getAssetUrl = (filename: string) => {
 // Social Icons as SVGs for reliability
 const LinkedInIcon = () => (
   <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.22a1.6 1.6 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0-1.6-1.6Z" />
+    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.22a1.6 1.6 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0-1.6-1.6Z" />
   </svg>
 );
 
@@ -31,19 +31,18 @@ const GitHubIcon = () => (
 );
 
 // ----------------------------------------------------
-// Advanced Cyber Mouse Cursor Engine
+// OpenAI Astra-Inspired Fluid Mouse Cursor
 // ----------------------------------------------------
-function CyberCursor() {
+function AstraCursor() {
   const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
   const [lagPos, setLagPos] = useState({ x: -100, y: -100 });
-  const [cursorType, setCursorType] = useState<'default' | 'pointer' | 'video' | 'slide' | 'terminal'>('default');
-  const [cursorLabel, setCursorLabel] = useState('');
+  const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
-    // Check if device is touch-first
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    // Detect touch / coarse devices
+    if (window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window) {
       setIsTouch(true);
       return;
     }
@@ -52,37 +51,16 @@ function CyberCursor() {
       setMousePos({ x: e.clientX, y: e.clientY });
       setIsVisible(true);
 
-      // Check hovered element
       const target = e.target as HTMLElement | null;
       if (!target) return;
-
-      const interactive = target.closest('button, a, input, [data-cursor]');
-      const videoArea = target.closest('[data-cursor="video"]');
-      const slideArea = target.closest('[data-cursor="slide"]');
-      const terminalArea = target.closest('[data-cursor="terminal"]');
-
-      if (videoArea) {
-        setCursorType('video');
-        setCursorLabel('STREAM');
-      } else if (slideArea) {
-        setCursorType('slide');
-        setCursorLabel('SLIDE');
-      } else if (terminalArea) {
-        setCursorType('terminal');
-        setCursorLabel('>_ CLI');
-      } else if (interactive) {
-        setCursorType('pointer');
-        setCursorLabel('EXPLORE');
-      } else {
-        setCursorType('default');
-        setCursorLabel('');
-      }
+      const interactive = target.closest('button, a, input, [data-interactive], .astra-glow-container, [role="button"]');
+      setIsHovering(!!interactive);
     };
 
     const handleMouseLeave = () => setIsVisible(false);
     const handleMouseEnter = () => setIsVisible(true);
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     document.addEventListener('mouseleave', handleMouseLeave);
     document.addEventListener('mouseenter', handleMouseEnter);
 
@@ -93,14 +71,14 @@ function CyberCursor() {
     };
   }, []);
 
-  // Smooth lag interpolation for the outer trailing radar ring
+  // 60fps Spring Interpolation for outer halo
   useEffect(() => {
     if (isTouch) return;
     let animId: number;
     const updateLag = () => {
       setLagPos((prev) => ({
-        x: prev.x + (mousePos.x - prev.x) * 0.18,
-        y: prev.y + (mousePos.y - prev.y) * 0.18,
+        x: prev.x + (mousePos.x - prev.x) * 0.16,
+        y: prev.y + (mousePos.y - prev.y) * 0.16,
       }));
       animId = requestAnimationFrame(updateLag);
     };
@@ -111,44 +89,100 @@ function CyberCursor() {
   if (isTouch || !isVisible) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden select-none">
-      {/* Precision Core Point */}
+    <div className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden select-none">
+      {/* Precision Micro Dot */}
       <div
-        className="fixed w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_12px_#38bdf8] transition-transform duration-75 -translate-x-1/2 -translate-y-1/2"
+        className="fixed w-1.5 h-1.5 rounded-full bg-blue-300 shadow-[0_0_8px_#60a5fa] -translate-x-1/2 -translate-y-1/2 transition-transform duration-75"
         style={{ left: `${mousePos.x}px`, top: `${mousePos.y}px` }}
       />
 
-      {/* Trailing Outer Cyber Radar Ring */}
+      {/* Soft Ambient Astra Glow Halo */}
       <div
-        className={`fixed rounded-full border transition-all duration-300 flex items-center justify-center -translate-x-1/2 -translate-y-1/2 backdrop-blur-[1px] ${
-          cursorType === 'pointer'
-            ? 'w-14 h-14 border-blue-400 bg-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.5)] scale-110'
-            : cursorType === 'video'
-            ? 'w-16 h-16 border-emerald-400 bg-emerald-500/20 shadow-[0_0_25px_rgba(16,185,129,0.5)] scale-125'
-            : cursorType === 'slide'
-            ? 'w-16 h-16 border-amber-400 bg-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.5)] scale-115'
-            : cursorType === 'terminal'
-            ? 'w-14 h-14 border-purple-400 bg-purple-500/20 shadow-[0_0_20px_rgba(168,85,247,0.5)] scale-110'
-            : 'w-8 h-8 border-cyan-400/50 bg-cyan-500/5'
+        className={`fixed rounded-full -translate-x-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none ${
+          isHovering
+            ? 'w-12 h-12 bg-blue-500/15 border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.35)] scale-110'
+            : 'w-7 h-7 bg-blue-500/8 border border-blue-400/20'
         }`}
         style={{ left: `${lagPos.x}px`, top: `${lagPos.y}px` }}
-      >
-        {cursorLabel && (
-          <span className="text-[9px] font-mono font-bold tracking-widest text-cyan-300 drop-shadow">
-            {cursorLabel}
-          </span>
-        )}
-      </div>
+      />
+    </div>
+  );
+}
 
-      {/* Crosshair telemetry coordinates HUD */}
-      {cursorType === 'default' && (
-        <div
-          className="fixed text-[8px] font-mono text-slate-500 tracking-tighter -translate-y-6 translate-x-4 pointer-events-none opacity-60"
-          style={{ left: `${mousePos.x}px`, top: `${mousePos.y}px` }}
-        >
-          X:{Math.round(mousePos.x)} Y:{Math.round(mousePos.y)}
-        </div>
-      )}
+// ----------------------------------------------------
+// Reusable OpenAI Astra Interactive Spotlight Card Component
+// ----------------------------------------------------
+function AstraCard({
+  children,
+  className = '',
+  tilt = true,
+  onClick,
+  onMouseEnter,
+  onMouseLeave
+}: {
+  children: React.ReactNode;
+  className?: string;
+  tilt?: boolean;
+  onClick?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+}) {
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+
+    if (tilt) {
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -2.2;
+      const rotateY = ((x - centerX) / centerX) * 2.2;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.015, 1.015, 1.015)`;
+    }
+  };
+
+  const handleMouseLeaveInner = () => {
+    const card = cardRef.current;
+    if (!card) return;
+    card.style.setProperty('--mouse-x', `-1000px`);
+    card.style.setProperty('--mouse-y', `-1000px`);
+    if (tilt) {
+      card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+    }
+    if (onMouseLeave) onMouseLeave();
+  };
+
+  const handleMouseEnterInner = () => {
+    if (onMouseEnter) onMouseEnter();
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeaveInner}
+      onMouseEnter={handleMouseEnterInner}
+      onClick={onClick}
+      className={`astra-glow-container relative rounded-3xl bg-slate-900/60 border border-slate-800/90 shadow-xl overflow-hidden ${className}`}
+    >
+      {/* Astra Dynamic Radial Spotlight Layer */}
+      <div className="astra-glow-overlay" />
+      {/* Astra Interactive Border Highlight */}
+      <div className="astra-border-highlight" />
+      {/* Card Content with proper z-index */}
+      <div className="relative z-10 w-full h-full flex flex-col justify-between">
+        {children}
+      </div>
     </div>
   );
 }
@@ -271,11 +305,9 @@ function CloudServicesBackground({
         n.y += n.vy;
         n.pulse += 0.03;
 
-        // Bounce off screen boundaries
         if (n.x < 0 || n.x > width) n.vx *= -1;
         if (n.y < 0 || n.y > height) n.vy *= -1;
 
-        // Mouse avoidance/gravitation
         const dx = mouse.x - n.x;
         const dy = mouse.y - n.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -284,7 +316,6 @@ function CloudServicesBackground({
           n.y -= (dy / dist) * 0.6;
         }
 
-        // Draw connections between near nodes
         for (let j = i + 1; j < nodes.length; j++) {
           const n2 = nodes[j];
           const dist2 = Math.hypot(n.x - n2.x, n.y - n2.y);
@@ -297,7 +328,6 @@ function CloudServicesBackground({
             ctx.lineWidth = 1;
             ctx.stroke();
 
-            // Moving data packet along line
             if ((frame + i * 10) % 120 === 0) {
               const packetPos = ((frame * 0.02) % 1);
               const px = n.x + (n2.x - n.x) * packetPos;
@@ -313,7 +343,6 @@ function CloudServicesBackground({
           }
         }
 
-        // Draw node body
         ctx.beginPath();
         const pulseSize = n.radius + Math.sin(n.pulse) * 0.8;
         ctx.arc(n.x, n.y, pulseSize, 0, Math.PI * 2);
@@ -323,7 +352,6 @@ function CloudServicesBackground({
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        // Draw label for key nodes
         if (i % 3 === 0) {
           ctx.font = '9px monospace';
           ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
@@ -388,7 +416,6 @@ export default function App() {
   const [showVideoOverlay, setShowVideoOverlay] = useState(true);
 
   useEffect(() => {
-    // Ensure initial scroll position starts at top of page
     window.scrollTo(0, 0);
 
     const handleScroll = () => {
@@ -408,8 +435,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 font-sans selection:bg-blue-500/30 selection:text-blue-300 relative overflow-x-hidden">
-      {/* Advanced Cyber Mouse Cursor */}
-      <CyberCursor />
+      {/* OpenAI Astra Fluid Mouse Cursor */}
+      <AstraCursor />
 
       {/* Top Scroll Progress Bar */}
       <div 
@@ -516,10 +543,10 @@ function Header() {
   ];
 
   return (
-    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0d14]/90 backdrop-blur-md border-b border-slate-800/80 py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#07090e]/92 backdrop-blur-xl border-b border-slate-800/80 py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <a href="#home" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:border-blue-400 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all">
+          <div className="w-10 h-10 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:border-blue-400 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all duration-300">
             <TerminalIcon className="w-5 h-5 group-hover:rotate-6 transition-transform" />
           </div>
           <div>
@@ -531,13 +558,13 @@ function Header() {
           </div>
         </a>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation with Astra Pill Hover */}
         <nav className="hidden lg:flex items-center gap-1 bg-slate-900/70 p-1.5 rounded-full border border-slate-800/80 backdrop-blur-md shadow-inner">
           {navItems.map((item) => (
             <a
               key={item.id}
               href={item.href}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-300 relative ${
                 activeSection === item.id
                   ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.6)] font-semibold'
                   : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
@@ -730,7 +757,7 @@ function Hero({
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10">
                 <a
                   href="#live-ops"
-                  className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm transition-all shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_40px_rgba(6,182,212,0.7)] hover:-translate-y-1 cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm transition-all duration-300 shadow-[0_0_25px_rgba(6,182,212,0.35)] hover:shadow-[0_0_40px_rgba(6,182,212,0.65)] hover:-translate-y-1 cursor-pointer"
                 >
                   <Video className="w-4 h-4" />
                   <span>Watch Cloud Video Ops</span>
@@ -738,7 +765,7 @@ function Hero({
 
                 <a
                   href="#architecture"
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-blue-500/50 font-semibold text-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/50 cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-blue-500/50 font-semibold text-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/50 cursor-pointer"
                 >
                   <Layers className="w-4 h-4 text-blue-400" />
                   <span>Architecture Visualizer</span>
@@ -748,7 +775,7 @@ function Hero({
                   href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 text-sm font-medium transition-all hover:-translate-y-0.5 cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
                 >
                   <Download className="w-4 h-4 text-emerald-400" />
                   <span>Resume (PDF)</span>
@@ -781,12 +808,10 @@ function Hero({
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              {/* Animated Radar Pulse Rings */}
               <div className="absolute inset-0 rounded-full border border-blue-500/20 animate-ping [animation-duration:4s] pointer-events-none" />
               <div className="absolute -inset-4 rounded-full border border-cyan-500/20 [animation-duration:6s] pointer-events-none" />
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/30 via-cyan-500/20 to-transparent rounded-full blur-2xl -z-10" />
 
-              {/* Profile Avatar Card */}
               <div className="w-72 h-72 sm:w-84 sm:h-84 md:w-96 md:h-96 rounded-full p-2.5 bg-gradient-to-b from-blue-500/40 via-slate-800 to-slate-900 border-2 border-blue-500/40 shadow-[0_0_50px_rgba(37,99,235,0.3)] relative group hover:border-blue-400 transition-all duration-500">
                 <div className="w-full h-full rounded-full overflow-hidden bg-slate-950 flex items-center justify-center relative">
                   {!imageError ? (
@@ -804,11 +829,9 @@ function Hero({
                     </div>
                   )}
 
-                  {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#07090e]/80 via-transparent to-transparent pointer-events-none" />
                 </div>
 
-                {/* Orbiting Tech Badges with hover interaction */}
                 <motion.div 
                   animate={{ y: [0, -8, 0] }}
                   transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
@@ -872,23 +895,16 @@ function StatsBar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800 flex items-start gap-4 hover:border-blue-500/40 hover:bg-slate-900/90 hover:shadow-[0_0_25px_rgba(59,130,246,0.15)] hover:-translate-y-1 transition-all duration-300 group cursor-default"
-            >
-              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 group-hover:scale-110 group-hover:border-blue-500/40 group-hover:bg-blue-600/10 transition-all duration-300">
+            <AstraCard key={idx} className="p-5 flex flex-row items-start gap-4">
+              <div className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60 transition-all duration-300">
                 {stat.icon}
               </div>
               <div>
-                <div className="text-2xl font-bold text-white tracking-tight group-hover:text-blue-300 transition-colors">{stat.value}</div>
+                <div className="text-2xl font-bold text-white tracking-tight">{stat.value}</div>
                 <div className="text-xs font-semibold text-slate-300 mt-0.5">{stat.label}</div>
                 <div className="text-[11px] text-slate-500 mt-1 font-mono">{stat.detail}</div>
               </div>
-            </motion.div>
+            </AstraCard>
           ))}
         </div>
       </div>
@@ -1016,7 +1032,7 @@ function CloudOpsLiveCenter() {
   const curr = channels[activeChannel];
 
   return (
-    <section id="live-ops" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10 overflow-hidden" data-cursor="slide">
+    <section id="live-ops" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Heading */}
@@ -1061,13 +1077,7 @@ function CloudOpsLiveCenter() {
         </div>
 
         {/* Main Video & Slide Showcase Player */}
-        <motion.div 
-          key={activeChannel}
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-3xl bg-gradient-to-b from-[#0e1424] via-[#090d16] to-[#0a0f1d] border border-blue-900/50 shadow-[0_0_50px_rgba(14,20,36,0.8)] overflow-hidden"
-        >
+        <AstraCard className="rounded-3xl bg-gradient-to-b from-[#0e1424] via-[#090d16] to-[#0a0f1d] border-blue-900/50 shadow-[0_0_50px_rgba(14,20,36,0.8)]">
           {/* Player Header HUD */}
           <div className="px-6 py-4 bg-[#0d121f]/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -1130,7 +1140,7 @@ function CloudOpsLiveCenter() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
             
             {/* Left Main Stream Window */}
-            <div className="lg:col-span-8 p-6 sm:p-8 flex flex-col justify-between relative min-h-[380px] bg-black/40" data-cursor="video">
+            <div className="lg:col-span-8 p-6 sm:p-8 flex flex-col justify-between relative min-h-[380px] bg-black/40">
               
               {/* Active Video Loop Layer */}
               <div className="absolute inset-0 overflow-hidden opacity-35 mix-blend-screen pointer-events-none">
@@ -1234,7 +1244,7 @@ function CloudOpsLiveCenter() {
             </div>
 
           </div>
-        </motion.div>
+        </AstraCard>
 
       </div>
     </section>
@@ -1307,7 +1317,6 @@ function InteractiveTerminal() {
     }
   };
 
-  // ONLY scroll internal terminal container on user commands, NEVER the main window
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -1321,7 +1330,7 @@ function InteractiveTerminal() {
   const quickCommands = ['help', 'whoami', 'skills', 'infra', 'experience', 'certs', 'contact'];
 
   return (
-    <section id="terminal" className="py-20 bg-[#07090e]/90 relative z-10" data-cursor="terminal">
+    <section id="terminal" className="py-20 bg-[#07090e]/90 relative z-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -1352,14 +1361,8 @@ function InteractiveTerminal() {
           ))}
         </div>
 
-        {/* Terminal Window with Hover Shadow */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.5 }}
-          className="rounded-2xl bg-[#090d16]/95 border border-slate-800 hover:border-blue-500/40 hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] transition-all duration-300 shadow-2xl overflow-hidden font-mono text-sm"
-        >
+        {/* Terminal Window with Astra Glow Container */}
+        <AstraCard className="rounded-2xl bg-[#090d16]/95 border-slate-800 font-mono text-sm shadow-2xl">
           {/* Terminal Titlebar */}
           <div className="px-4 py-3 bg-[#0d121f] border-b border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -1412,7 +1415,7 @@ function InteractiveTerminal() {
               />
             </div>
           </div>
-        </motion.div>
+        </AstraCard>
       </div>
     </section>
   );
@@ -1497,60 +1500,42 @@ function ArchitectureVisualizer() {
           </p>
         </motion.div>
 
-        {/* Pipeline Grid with Rich Hover Effects */}
+        {/* Pipeline Grid with Astra Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pipelineSteps.map((step, idx) => (
-            <motion.div
+            <AstraCard
               key={step.id}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: idx * 0.08 }}
               onMouseEnter={() => setActiveStep(idx)}
               onMouseLeave={() => setActiveStep(null)}
-              className={`p-6 rounded-3xl bg-slate-900/60 border transition-all duration-300 relative overflow-hidden cursor-pointer ${
-                activeStep === idx 
-                  ? 'border-blue-500/80 bg-slate-900 shadow-[0_0_35px_rgba(59,130,246,0.25)] -translate-y-2 scale-[1.02]' 
-                  : 'border-slate-800 hover:border-slate-700 hover:-translate-y-1'
-              }`}
+              className="p-6 cursor-pointer"
             >
-              {/* Step Number */}
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-white transition-transform duration-300 ${activeStep === idx ? 'scale-110 bg-blue-600/20 border-blue-500/40' : ''}`}>
-                  {step.icon}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`p-3 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-white transition-transform duration-300 ${activeStep === idx ? 'scale-110 bg-blue-600/20 border-blue-500/40' : ''}`}>
+                    {step.icon}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[11px] font-mono px-3 py-1 rounded-full border transition-colors ${activeStep === idx ? 'bg-blue-600 text-white border-blue-400 font-bold' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>
+                      Stage 0{step.id}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-[11px] font-mono px-3 py-1 rounded-full border transition-colors ${activeStep === idx ? 'bg-blue-600 text-white border-blue-400 font-bold' : 'bg-slate-800 text-slate-300 border-slate-700'}`}>
-                    Stage 0{step.id}
-                  </span>
-                </div>
-              </div>
 
-              <div className="text-xs font-mono font-semibold text-blue-400 mb-1">{step.badge}</div>
-              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-200">{step.title}</h3>
-              <p className="text-xs text-slate-400 leading-relaxed mb-5">{step.desc}</p>
+                <div className="text-xs font-mono font-semibold text-blue-400 mb-1">{step.badge}</div>
+                <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
+                <p className="text-xs text-slate-400 leading-relaxed mb-5">{step.desc}</p>
+              </div>
               
               <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400 font-mono">
                 <span className="text-slate-500">Tech:</span>
                 <span className="text-slate-200 font-semibold">{step.tech}</span>
               </div>
-
-              {/* Glowing Corner Accent */}
-              {activeStep === idx && (
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/15 rounded-full blur-2xl pointer-events-none" />
-              )}
-            </motion.div>
+            </AstraCard>
           ))}
         </div>
 
         {/* Multi-Cloud & Hypervisor Interconnect Banner */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.5 }}
-          className="mt-12 p-7 rounded-3xl bg-gradient-to-r from-blue-950/50 via-slate-900 to-indigo-950/50 border border-blue-900/50 hover:border-blue-500/50 hover:shadow-[0_0_35px_rgba(59,130,246,0.2)] transition-all duration-300 flex flex-col md:flex-row items-center justify-between gap-6"
-        >
+        <AstraCard className="mt-12 p-7 bg-gradient-to-r from-blue-950/50 via-slate-900 to-indigo-950/50 border-blue-900/50 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="p-3.5 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30">
               <HardDrive className="w-6 h-6" />
@@ -1568,7 +1553,7 @@ function ArchitectureVisualizer() {
               ✓ Automated DR & Backups
             </span>
           </div>
-        </motion.div>
+        </AstraCard>
       </div>
     </section>
   );
@@ -1627,69 +1612,45 @@ function AboutSection() {
           </motion.div>
 
           <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4 }}
-              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(59,130,246,0.18)] hover:-translate-y-1.5 transition-all duration-300 group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+            <AstraCard className="p-6">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center mb-4 transition-all duration-300">
                 <Cloud className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">Cloud Operations</h3>
+              <h3 className="text-lg font-bold text-white mb-2">Cloud Operations</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Resource rightsizing, cost optimization, IAM access management, and high availability deployments across AWS and GCP.
               </p>
-            </motion.div>
+            </AstraCard>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(16,185,129,0.18)] hover:-translate-y-1.5 transition-all duration-300 group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+            <AstraCard className="p-6">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center mb-4 transition-all duration-300">
                 <Server className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">Virtualization & OS</h3>
+              <h3 className="text-lg font-bold text-white mb-2">Virtualization & OS</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 VMware ESXi hypervisors, capacity planning, VM provisioning, Ubuntu Linux administration, and Windows Server 2016-2022.
               </p>
-            </motion.div>
+            </AstraCard>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-purple-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(168,85,247,0.18)] hover:-translate-y-1.5 transition-all duration-300 group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+            <AstraCard className="p-6">
+              <div className="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center mb-4 transition-all duration-300">
                 <Shield className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">Security & Networking</h3>
+              <h3 className="text-lg font-bold text-white mb-2">Security & Networking</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Firewall configuration, DNS, DHCP, VPN, TCP/IP, network troubleshooting, and cybersecurity compliance frameworks.
               </p>
-            </motion.div>
+            </AstraCard>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(245,158,11,0.18)] hover:-translate-y-1.5 transition-all duration-300 group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300">
+            <AstraCard className="p-6">
+              <div className="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 flex items-center justify-center mb-4 transition-all duration-300">
                 <HardDrive className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-amber-300 transition-colors">Datacenter Ops</h3>
+              <h3 className="text-lg font-bold text-white mb-2">Datacenter Ops</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Hardware maintenance, RAID disk configuration, rack installations, network cabling, and disaster recovery execution.
               </p>
-            </motion.div>
+            </AstraCard>
           </div>
 
         </div>
@@ -1825,32 +1786,25 @@ function SkillsMatrix() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {skillCategories.map((group, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: idx * 0.06 }}
-              className="p-6 rounded-3xl bg-slate-900/50 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group"
-            >
+            <AstraCard key={idx} className="p-6 flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-800/80">
-                  <div className="p-2.5 rounded-2xl bg-slate-800 text-white group-hover:scale-110 group-hover:bg-blue-600/20 group-hover:border-blue-500/30 transition-all">
+                  <div className="p-2.5 rounded-2xl bg-slate-800 text-white transition-all">
                     {group.icon}
                   </div>
-                  <h3 className="font-bold text-white text-base leading-snug group-hover:text-blue-300 transition-colors">{group.category}</h3>
+                  <h3 className="font-bold text-white text-base leading-snug">{group.category}</h3>
                 </div>
 
                 <ul className="space-y-2.5">
                   {group.skills.map((skill, sIdx) => (
-                    <li key={sIdx} className="text-xs text-slate-300 flex items-start gap-2 group-hover:text-slate-200 transition-colors">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0 group-hover:bg-cyan-400 transition-colors" />
+                    <li key={sIdx} className="text-xs text-slate-300 flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
                       <span className="leading-tight">{skill}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-            </motion.div>
+            </AstraCard>
           ))}
         </div>
       </div>
@@ -1922,24 +1876,15 @@ function CareerJourney() {
         </motion.div>
 
         <div className="space-y-12 relative">
-          {/* Vertical Guide Line */}
           <div className="hidden md:block absolute left-8 top-6 bottom-6 w-0.5 bg-gradient-to-b from-blue-500 via-indigo-500 to-transparent" />
 
           {experiences.map((exp, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: idx * 0.15 }}
-              className="relative md:pl-20"
-            >
-              {/* Timeline Indicator Dot */}
+            <div key={idx} className="relative md:pl-20">
               <div className="hidden md:flex absolute left-5 top-7 w-6 h-6 rounded-full bg-slate-900 border-2 border-blue-500 items-center justify-center -translate-x-1/2 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
                 <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
               </div>
 
-              <div className="p-8 sm:p-10 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 hover:bg-slate-900 hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] hover:-translate-y-1 transition-all duration-300 shadow-xl">
+              <AstraCard className="p-8 sm:p-10 shadow-xl">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-4 border-b border-slate-800">
                   <div>
                     <span className="text-xs font-mono text-blue-400 uppercase tracking-wider font-semibold">{exp.type}</span>
@@ -1971,8 +1916,8 @@ function CareerJourney() {
                     </span>
                   ))}
                 </div>
-              </div>
-            </motion.div>
+              </AstraCard>
+            </div>
           ))}
         </div>
       </div>
@@ -1987,13 +1932,7 @@ function DatacenterSection() {
   return (
     <section className="py-20 bg-[#0a0d16]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.5 }}
-          className="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-[#0c1220] via-slate-900 to-[#0c1220] border border-blue-900/40 hover:border-blue-500/40 hover:shadow-[0_0_40px_rgba(59,130,246,0.18)] transition-all duration-300 relative overflow-hidden"
-        >
+        <AstraCard className="p-8 sm:p-12 bg-gradient-to-br from-[#0c1220] via-slate-900 to-[#0c1220] border-blue-900/40">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div className="lg:col-span-7">
@@ -2068,7 +2007,7 @@ function DatacenterSection() {
             </div>
 
           </div>
-        </motion.div>
+        </AstraCard>
       </div>
     </section>
   );
@@ -2131,7 +2070,7 @@ function ProjectsSection() {
   const activeProject = projects[projectSlide];
 
   return (
-    <section id="projects" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10" data-cursor="slide">
+    <section id="projects" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -2187,7 +2126,7 @@ function ProjectsSection() {
           </div>
         </div>
 
-        {/* Slide Card Content */}
+        {/* Slide Card Content with AstraCard */}
         <AnimatePresence mode="wait">
           <motion.div
             key={projectSlide}
@@ -2195,53 +2134,54 @@ function ProjectsSection() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -25 }}
             transition={{ duration: 0.35 }}
-            className="max-w-4xl mx-auto p-8 sm:p-12 rounded-3xl bg-slate-900/70 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_40px_rgba(59,130,246,0.2)] transition-all duration-300 shadow-2xl relative overflow-hidden"
           >
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-              <span className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-semibold border ${activeProject.badgeColor}`}>
-                {activeProject.category}
-              </span>
-              <span className="text-xs font-mono text-slate-500">
-                Project 0{projectSlide + 1} / 0{projects.length}
-              </span>
-            </div>
+            <AstraCard className="max-w-4xl mx-auto p-8 sm:p-12 shadow-2xl">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                <span className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-semibold border ${activeProject.badgeColor}`}>
+                  {activeProject.category}
+                </span>
+                <span className="text-xs font-mono text-slate-500">
+                  Project 0{projectSlide + 1} / 0{projects.length}
+                </span>
+              </div>
 
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 leading-snug">
-              {activeProject.title}
-            </h3>
-            <p className="text-xs sm:text-sm font-mono text-blue-400 mb-6">
-              {activeProject.tagline}
-            </p>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 leading-snug">
+                {activeProject.title}
+              </h3>
+              <p className="text-xs sm:text-sm font-mono text-blue-400 mb-6">
+                {activeProject.tagline}
+              </p>
 
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-8">
-              {activeProject.description}
-            </p>
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-8">
+                {activeProject.description}
+              </p>
 
-            {/* Key Deliverables */}
-            <div className="mb-8 space-y-2.5">
-              <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold mb-2">Key Outcomes:</div>
-              {activeProject.highlights.map((h, hIdx) => (
-                <div key={hIdx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span>{h}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Tech Stack Pills */}
-            <div className="pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex flex-wrap gap-2">
-                {activeProject.tech.map((t, tIdx) => (
-                  <span key={tIdx} className="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700/60">
-                    {t}
-                  </span>
+              {/* Key Deliverables */}
+              <div className="mb-8 space-y-2.5">
+                <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold mb-2">Key Outcomes:</div>
+                {activeProject.highlights.map((h, hIdx) => (
+                  <div key={hIdx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-200">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <span>{h}</span>
+                  </div>
                 ))}
               </div>
 
-              <span className="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-lg border border-emerald-800/60">
-                {activeProject.metrics}
-              </span>
-            </div>
+              {/* Tech Stack Pills */}
+              <div className="pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap gap-2">
+                  {activeProject.tech.map((t, tIdx) => (
+                    <span key={tIdx} className="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700/60">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                <span className="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-lg border border-emerald-800/60">
+                  {activeProject.metrics}
+                </span>
+              </div>
+            </AstraCard>
           </motion.div>
         </AnimatePresence>
 
@@ -2326,17 +2266,10 @@ function CertificationsSection({ onSelectCert }: { onSelectCert: (cert: any) => 
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {certifications.map((cert, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: idx * 0.08 }}
-              className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_35px_rgba(59,130,246,0.18)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group shadow-lg"
-            >
+            <AstraCard key={idx} className="p-6 flex flex-col justify-between shadow-lg">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="p-3 rounded-2xl bg-blue-600/10 text-blue-400 border border-blue-500/20 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                  <div className="p-3 rounded-2xl bg-blue-600/10 text-blue-400 border border-blue-500/20">
                     <FileText className="w-5 h-5" />
                   </div>
                   <span className="text-[10px] font-mono px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
@@ -2345,7 +2278,7 @@ function CertificationsSection({ onSelectCert }: { onSelectCert: (cert: any) => 
                 </div>
 
                 <div className="text-xs font-mono text-blue-400 font-semibold mb-1">{cert.badge}</div>
-                <h3 className="font-bold text-white text-base leading-snug mb-2 group-hover:text-blue-300 transition-colors">{cert.name}</h3>
+                <h3 className="font-bold text-white text-base leading-snug mb-2">{cert.name}</h3>
                 <div className="text-xs text-slate-400 font-medium mb-3">Issued by {cert.issuer}</div>
                 <p className="text-xs text-slate-400 leading-relaxed mb-4">{cert.description}</p>
 
@@ -2382,7 +2315,7 @@ function CertificationsSection({ onSelectCert }: { onSelectCert: (cert: any) => 
                   </span>
                 )}
               </div>
-            </motion.div>
+            </AstraCard>
           ))}
         </div>
       </div>
@@ -2417,20 +2350,13 @@ function PhilosophySection() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {pillars.map((p, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4, delay: idx * 0.08 }}
-              className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 hover:border-blue-500/40 hover:bg-slate-900/80 hover:-translate-y-1 transition-all duration-300 text-center group cursor-default"
-            >
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-800 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-600/20 transition-all duration-300">
+            <AstraCard key={idx} className="p-6 text-center">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-slate-800 flex items-center justify-center mb-4 transition-all duration-300">
                 {p.icon}
               </div>
-              <h3 className="font-bold text-white text-base mb-2 group-hover:text-blue-300 transition-colors">{p.title}</h3>
+              <h3 className="font-bold text-white text-base mb-2">{p.title}</h3>
               <p className="text-xs text-slate-400 leading-relaxed">{p.desc}</p>
-            </motion.div>
+            </AstraCard>
           ))}
         </div>
       </div>
@@ -2445,28 +2371,21 @@ function EducationSection() {
   return (
     <section id="education" className="py-20 bg-[#0a0d16]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-4">
+        <AstraCard className="p-8 sm:p-10 text-center">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-4 mx-auto">
             <GraduationCap className="w-3.5 h-3.5" />
             <span>ACADEMIC FOUNDATION</span>
           </div>
           
-          <div className="p-8 sm:p-10 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] transition-all duration-300 text-center">
-            <h3 className="text-2xl font-bold text-white mb-2">Bachelor of Technology in Computer Science and Engineering</h3>
-            <div className="text-blue-400 font-semibold text-base mb-4">Nitra Technical Campus, Ghaziabad, UP</div>
-            <div className="inline-block px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-xs font-mono text-slate-300">
-              2022 — 2026 • Computer Science & Engineering
-            </div>
-            <p className="text-xs text-slate-400 mt-4 max-w-xl mx-auto leading-relaxed">
-              Focus on Operating Systems, Computer Networks, Distributed Computing, Database Management Systems, and Cloud Architectures.
-            </p>
+          <h3 className="text-2xl font-bold text-white mb-2">Bachelor of Technology in Computer Science and Engineering</h3>
+          <div className="text-blue-400 font-semibold text-base mb-4">Nitra Technical Campus, Ghaziabad, UP</div>
+          <div className="inline-block px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-xs font-mono text-slate-300">
+            2022 — 2026 • Computer Science & Engineering
           </div>
-        </motion.div>
+          <p className="text-xs text-slate-400 mt-4 max-w-xl mx-auto leading-relaxed">
+            Focus on Operating Systems, Computer Networks, Distributed Computing, Database Management Systems, and Cloud Architectures.
+          </p>
+        </AstraCard>
       </div>
     </section>
   );

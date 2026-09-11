@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0a0a0f;
-  --color-surface: #111116;
+  --color-background: #07090e;
+  --color-surface: #0e131f;
   --color-primary: #3b82f6;
   --color-secondary: #1e293b;
   --color-textMain: #f8fafc;
   --color-textMuted: #94a3b8;
-  --font-sans: "Inter", sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "Fira Code", monospace;
 }
 
@@ -21,16 +21,72 @@ body {
 
 ::selection {
   background-color: rgba(59, 130, 246, 0.3);
-  color: var(--color-primary);
+  color: #93c5fd;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-.glass-panel {
-  background-color: rgba(17, 17, 22, 0.8);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+/* OpenAI Astra Subtle Radial Spotlight & Border Glow */
+.astra-glow-container {
+  --mouse-x: -1000px;
+  --mouse-y: -1000px;
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.astra-glow-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: radial-gradient(
+    450px circle at var(--mouse-x) var(--mouse-y),
+    rgba(59, 130, 246, 0.08),
+    rgba(14, 165, 233, 0.03) 40%,
+    transparent 80%
+  );
+  border-radius: inherit;
+  z-index: 1;
+}
+
+.astra-glow-container:hover .astra-glow-overlay {
+  opacity: 1;
+}
+
+/* Subtle Interactive Border Highlight on Mouse Movement */
+.astra-border-highlight {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: radial-gradient(
+    280px circle at var(--mouse-x) var(--mouse-y),
+    rgba(147, 197, 253, 0.35),
+    rgba(59, 130, 246, 0.15) 30%,
+    transparent 70%
+  );
+  border-radius: inherit;
+  z-index: 0;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  padding: 1px;
+}
+
+.astra-glow-container:hover .astra-border-highlight {
+  opacity: 1;
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .astra-glow-container {
+    transition: none !important;
+    transform: none !important;
+  }
 }
