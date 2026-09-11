@@ -20,7 +20,7 @@ body {
 }
 
 ::selection {
-  background-color: rgba(59, 130, 246, 0.3);
+  background-color: rgba(59, 130, 246, 0.35);
   color: #93c5fd;
 }
 
@@ -28,50 +28,60 @@ html {
   scroll-behavior: smooth;
 }
 
-/* OpenAI Astra Subtle Radial Spotlight & Border Glow */
-.astra-glow-container {
-  --mouse-x: -1000px;
-  --mouse-y: -1000px;
+/* ----------------------------------------------------
+   OpenAI Astra-Inspired Fluid Multi-Layer Card System
+   ---------------------------------------------------- */
+.astra-card {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-opacity: 0;
+  --border-opacity: 0;
   position: relative;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 1.5rem;
+  background-color: rgba(14, 19, 31, 0.75);
+  border: 1px solid rgba(30, 41, 59, 0.85);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
   will-change: transform;
+  transform-style: preserve-3d;
+  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.astra-glow-overlay {
+.astra-card:hover {
+  box-shadow: 0 20px 40px -15px rgba(2, 6, 23, 0.8), 0 0 25px -5px rgba(59, 130, 246, 0.15);
+}
+
+/* Internal Radial Spotlight Layer */
+.astra-spotlight-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: inherit;
+  opacity: var(--spotlight-opacity, 0);
+  transition: opacity 0.35s ease-out;
   background: radial-gradient(
-    450px circle at var(--mouse-x) var(--mouse-y),
-    rgba(59, 130, 246, 0.08),
-    rgba(14, 165, 233, 0.03) 40%,
+    480px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(59, 130, 246, 0.11),
+    rgba(14, 165, 233, 0.04) 45%,
     transparent 80%
   );
-  border-radius: inherit;
   z-index: 1;
 }
 
-.astra-glow-container:hover .astra-glow-overlay {
-  opacity: 1;
-}
-
-/* Subtle Interactive Border Highlight on Mouse Movement */
-.astra-border-highlight {
+/* Dynamic Border Highlight Layer (Lights up right at cursor entry point) */
+.astra-border-glow-layer {
   position: absolute;
   inset: -1px;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  background: radial-gradient(
-    280px circle at var(--mouse-x) var(--mouse-y),
-    rgba(147, 197, 253, 0.35),
-    rgba(59, 130, 246, 0.15) 30%,
-    transparent 70%
-  );
   border-radius: inherit;
-  z-index: 0;
+  opacity: var(--border-opacity, 0);
+  transition: opacity 0.35s ease-out;
+  background: radial-gradient(
+    280px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(147, 197, 253, 0.55),
+    rgba(59, 130, 246, 0.25) 35%,
+    transparent 75%
+  );
+  z-index: 2;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -79,14 +89,55 @@ html {
   padding: 1px;
 }
 
-.astra-glow-container:hover .astra-border-highlight {
+/* Content Parallax Container */
+.astra-card-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+/* Magnetic Button Subtle Internal Light Reflection */
+.magnetic-btn {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.magnetic-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    140px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.2),
+    transparent 70%
+  );
+}
+
+.magnetic-btn:hover::before {
   opacity: 1;
 }
 
-/* Respect Reduced Motion */
+/* Reduced Motion and Touch Devices Fallbacks */
 @media (prefers-reduced-motion: reduce) {
-  .astra-glow-container {
+  .astra-card,
+  .magnetic-btn,
+  .astra-spotlight-layer,
+  .astra-border-glow-layer {
     transition: none !important;
+    transform: none !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .astra-card {
     transform: none !important;
   }
 }

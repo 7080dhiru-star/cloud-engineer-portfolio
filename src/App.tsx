@@ -31,87 +31,218 @@ const GitHubIcon = () => (
 );
 
 // ----------------------------------------------------
-// OpenAI Astra-Inspired Fluid Mouse Cursor
+// OpenAI Astra-Inspired Fluid Global Cursor Aura (Zero Re-render Physics Loop)
 // ----------------------------------------------------
-function AstraCursor() {
-  const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
-  const [lagPos, setLagPos] = useState({ x: -100, y: -100 });
-  const [isHovering, setIsHovering] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isTouch, setIsTouch] = useState(false);
+function GlobalCursorAura() {
+  const dotRef = useRef<HTMLDivElement | null>(null);
+  const haloRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window) {
-      setIsTouch(true);
+    // Disable on mobile/touch screens and reduced-motion preferences
+    if (
+      window.matchMedia('(pointer: coarse)').matches ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      'ontouchstart' in window
+    ) {
       return;
     }
 
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-      setIsVisible(true);
+    const mouse = { x: -100, y: -100, targetX: -100, targetY: -100, isHovering: false, isDown: false, isVisible: false };
+    let currentX = -100;
+    let currentY = -100;
+    let dotX = -100;
+    let dotY = -100;
+    let animId: number;
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouse.targetX = e.clientX;
+      mouse.targetY = e.clientY;
+      mouse.isVisible = true;
 
       const target = e.target as HTMLElement | null;
-      if (!target) return;
-      const interactive = target.closest('button, a, input, [data-interactive], .astra-glow-container, [role="button"]');
-      setIsHovering(!!interactive);
+      if (target) {
+        const interactive = target.closest('button, a, input, [data-magnetic], [data-interactive], .astra-card, [role="button"]');
+        mouse.isHovering = !!interactive;
+      }
     };
 
-    const handleMouseLeave = () => setIsVisible(false);
-    const handleMouseEnter = () => setIsVisible(true);
+    const onMouseDown = () => { mouse.isDown = true; };
+    const onMouseUp = () => { mouse.isDown = false; };
+    const onMouseLeave = () => { mouse.isVisible = false; };
+    const onMouseEnter = () => { mouse.isVisible = true; };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseenter', handleMouseEnter);
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('mousedown', onMouseDown, { passive: true });
+    window.addEventListener('mouseup', onMouseUp, { passive: true });
+    document.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('mouseenter', onMouseEnter);
+
+    const render = () => {
+      if (mouse.isVisible) {
+        // Fluid Lerp Interpolation
+        currentX += (mouse.targetX - currentX) * 0.14;
+        currentY += (mouse.targetY - currentY) * 0.14;
+        dotX += (mouse.targetX - dotX) * 0.48;
+        dotY += (mouse.targetY - dotY) * 0.48;
+
+        const vx = mouse.targetX - currentX;
+        const vy = mouse.targetY - currentY;
+        const speed = Math.min(Math.hypot(vx, vy) * 0.003, 0.25);
+
+        if (dotRef.current) {
+          dotRef.current.style.transform = `translate3d(${dotX}px, ${dotY}px, 0) translate(-50%, -50%) scale(${mouse.isDown ? 0.75 : 1})`;
+          dotRef.current.style.opacity = '1';
+        }
+
+        if (haloRef.current) {
+          const scale = mouse.isHovering ? 1.45 : mouse.isDown ? 0.85 : 1.0;
+          haloRef.current.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%) scale(${scale + speed})`;
+          haloRef.current.style.opacity = mouse.isHovering ? '0.95' : '0.7';
+          haloRef.current.style.borderColor = mouse.isHovering ? 'rgba(96, 165, 250, 0.4)' : 'rgba(59, 130, 246, 0.2)';
+          haloRef.current.style.boxShadow = mouse.isHovering 
+            ? '0 0 25px rgba(59, 130, 246, 0.35), inset 0 0 15px rgba(59, 130, 246, 0.15)' 
+            : '0 0 12px rgba(59, 130, 246, 0.15)';
+        }
+      } else {
+        if (dotRef.current) dotRef.current.style.opacity = '0';
+        if (haloRef.current) haloRef.current.style.opacity = '0';
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('mouseenter', handleMouseEnter);
+      cancelAnimationFrame(animId);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('mouseenter', onMouseEnter);
     };
   }, []);
 
-  // 60fps Spring Interpolation for outer halo
-  useEffect(() => {
-    if (isTouch) return;
-    let animId: number;
-    const updateLag = () => {
-      setLagPos((prev) => ({
-        x: prev.x + (mousePos.x - prev.x) * 0.16,
-        y: prev.y + (mousePos.y - prev.y) * 0.16,
-      }));
-      animId = requestAnimationFrame(updateLag);
-    };
-    animId = requestAnimationFrame(updateLag);
-    return () => cancelAnimationFrame(animId);
-  }, [mousePos, isTouch]);
-
-  if (isTouch || !isVisible) return null;
-
   return (
     <div className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden select-none">
+      {/* Precision Core Dot */}
       <div
-        className="fixed w-1.5 h-1.5 rounded-full bg-blue-300 shadow-[0_0_8px_#60a5fa] -translate-x-1/2 -translate-y-1/2 transition-transform duration-75"
-        style={{ left: `${mousePos.x}px`, top: `${mousePos.y}px` }}
+        ref={dotRef}
+        className="fixed top-0 left-0 w-2 h-2 rounded-full bg-blue-300 shadow-[0_0_10px_#93c5fd] pointer-events-none transition-opacity duration-300"
+        style={{ opacity: 0 }}
       />
+      {/* Ambient Fluid Luminous Aura */}
       <div
-        className={`fixed rounded-full -translate-x-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none ${
-          isHovering
-            ? 'w-12 h-12 bg-blue-500/15 border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.35)] scale-110'
-            : 'w-7 h-7 bg-blue-500/8 border border-blue-400/20'
-        }`}
-        style={{ left: `${lagPos.x}px`, top: `${lagPos.y}px` }}
+        ref={haloRef}
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-blue-400/25 bg-blue-500/10 backdrop-blur-[0.5px] pointer-events-none transition-opacity duration-300"
+        style={{ opacity: 0 }}
       />
     </div>
   );
 }
 
 // ----------------------------------------------------
-// Reusable OpenAI Astra Interactive Spotlight Card Component
+// Reusable Magnetic Attraction Component for CTA & Action Buttons
+// ----------------------------------------------------
+function Magnetic({
+  children,
+  className = '',
+  strength = 0.22,
+  maxDisplacement = 8
+}: {
+  children: React.ReactNode;
+  className?: string;
+  strength?: number;
+  maxDisplacement?: number;
+}) {
+  const elRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = elRef.current;
+    if (!el || window.matchMedia('(pointer: coarse)').matches) return;
+
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let isHovered = false;
+    let animId: number;
+
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = el.getBoundingClientRect();
+      const relX = e.clientX - rect.left;
+      const relY = e.clientY - rect.top;
+
+      el.style.setProperty('--mouse-x', `${relX}px`);
+      el.style.setProperty('--mouse-y', `${relY}px`);
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const dx = (relX - centerX) * strength;
+      const dy = (relY - centerY) * strength;
+
+      targetX = Math.max(-maxDisplacement, Math.min(maxDisplacement, dx));
+      targetY = Math.max(-maxDisplacement, Math.min(maxDisplacement, dy));
+    };
+
+    const onMouseEnter = () => {
+      isHovered = true;
+      startAnimation();
+    };
+
+    const onMouseLeave = () => {
+      isHovered = false;
+      targetX = 0;
+      targetY = 0;
+    };
+
+    const tick = () => {
+      currentX += (targetX - currentX) * 0.18;
+      currentY += (targetY - currentY) * 0.18;
+
+      el.style.transform = `translate3d(${currentX.toFixed(2)}px, ${currentY.toFixed(2)}px, 0)`;
+
+      if (!isHovered && Math.abs(currentX) < 0.05 && Math.abs(currentY) < 0.05) {
+        el.style.transform = `translate3d(0px, 0px, 0)`;
+        return;
+      }
+
+      animId = requestAnimationFrame(tick);
+    };
+
+    const startAnimation = () => {
+      cancelAnimationFrame(animId);
+      animId = requestAnimationFrame(tick);
+    };
+
+    el.addEventListener('mousemove', onMouseMove);
+    el.addEventListener('mouseenter', onMouseEnter);
+    el.addEventListener('mouseleave', onMouseLeave);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      el.removeEventListener('mousemove', onMouseMove);
+      el.removeEventListener('mouseenter', onMouseEnter);
+      el.removeEventListener('mouseleave', onMouseLeave);
+    };
+  }, [strength, maxDisplacement]);
+
+  return (
+    <div ref={elRef} data-magnetic="true" className={`magnetic-btn inline-block ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+// ----------------------------------------------------
+// Reusable Multi-Layer OpenAI Astra Interactive 3D Card
 // ----------------------------------------------------
 function AstraCard({
   children,
   className = '',
   tilt = true,
+  maxTilt = 3.2,
+  maxTranslate = 4,
   onClick,
   onMouseEnter,
   onMouseLeave
@@ -119,61 +250,120 @@ function AstraCard({
   children: React.ReactNode;
   className?: string;
   tilt?: boolean;
+  maxTilt?: number;
+  maxTranslate?: number;
   onClick?: () => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }) {
   const cardRef = useRef<HTMLDivElement | null>(null);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  useEffect(() => {
     const card = cardRef.current;
-    if (!card) return;
+    if (!card || window.matchMedia('(pointer: coarse)').matches) return;
 
-    if (window.matchMedia('(pointer: coarse)').matches) return;
+    let targetRotX = 0;
+    let targetRotY = 0;
+    let targetTransX = 0;
+    let targetTransY = 0;
+    let currentRotX = 0;
+    let currentRotY = 0;
+    let currentTransX = 0;
+    let currentTransY = 0;
+    let isHovered = false;
+    let animId: number;
 
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
 
-    if (tilt) {
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const rotateX = ((y - centerY) / centerY) * -2.2;
-      const rotateY = ((x - centerX) / centerX) * 2.2;
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.015, 1.015, 1.015)`;
-    }
-  };
+      if (tilt) {
+        const normX = (x - rect.width / 2) / (rect.width / 2);
+        const normY = (y - rect.height / 2) / (rect.height / 2);
 
-  const handleMouseLeaveInner = () => {
-    const card = cardRef.current;
-    if (!card) return;
-    card.style.setProperty('--mouse-x', `-1000px`);
-    card.style.setProperty('--mouse-y', `-1000px`);
-    if (tilt) {
-      card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-    }
-    if (onMouseLeave) onMouseLeave();
-  };
+        targetRotX = -normY * maxTilt;
+        targetRotY = normX * maxTilt;
+        targetTransX = normX * maxTranslate;
+        targetTransY = normY * maxTranslate;
+      }
+    };
 
-  const handleMouseEnterInner = () => {
-    if (onMouseEnter) onMouseEnter();
-  };
+    const onMouseEnterCard = () => {
+      isHovered = true;
+      card.style.setProperty('--spotlight-opacity', '1');
+      card.style.setProperty('--border-opacity', '1');
+      startAnimation();
+    };
+
+    const onMouseLeaveCard = () => {
+      isHovered = false;
+      targetRotX = 0;
+      targetRotY = 0;
+      targetTransX = 0;
+      targetTransY = 0;
+      card.style.setProperty('--spotlight-opacity', '0');
+      card.style.setProperty('--border-opacity', '0');
+    };
+
+    const tick = () => {
+      currentRotX += (targetRotX - currentRotX) * 0.12;
+      currentRotY += (targetRotY - currentRotY) * 0.12;
+      currentTransX += (targetTransX - currentTransX) * 0.12;
+      currentTransY += (targetTransY - currentTransY) * 0.12;
+
+      if (tilt) {
+        card.style.transform = `perspective(1000px) rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg) translate3d(${currentTransX.toFixed(2)}px, ${currentTransY.toFixed(2)}px, 0)`;
+      }
+
+      if (
+        !isHovered &&
+        Math.abs(currentRotX) < 0.05 &&
+        Math.abs(currentRotY) < 0.05 &&
+        Math.abs(currentTransX) < 0.05 &&
+        Math.abs(currentTransY) < 0.05
+      ) {
+        card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0)`;
+        return;
+      }
+
+      animId = requestAnimationFrame(tick);
+    };
+
+    const startAnimation = () => {
+      cancelAnimationFrame(animId);
+      animId = requestAnimationFrame(tick);
+    };
+
+    card.addEventListener('mousemove', onMouseMove);
+    card.addEventListener('mouseenter', onMouseEnterCard);
+    card.addEventListener('mouseleave', onMouseLeaveCard);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      card.removeEventListener('mousemove', onMouseMove);
+      card.removeEventListener('mouseenter', onMouseEnterCard);
+      card.removeEventListener('mouseleave', onMouseLeaveCard);
+    };
+  }, [tilt, maxTilt, maxTranslate]);
 
   return (
     <div
       ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeaveInner}
-      onMouseEnter={handleMouseEnterInner}
       onClick={onClick}
-      className={`astra-glow-container relative rounded-3xl bg-slate-900/60 border border-slate-800/90 shadow-xl overflow-hidden ${className}`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      className={`astra-card overflow-hidden ${className}`}
     >
-      <div className="astra-glow-overlay" />
-      <div className="astra-border-highlight" />
-      <div className="relative z-10 w-full h-full flex flex-col justify-between">
+      {/* Layer 2: Radial Spotlight Light */}
+      <div className="astra-spotlight-layer" />
+      {/* Layer 3: Dynamic Cursor Border Glow */}
+      <div className="astra-border-glow-layer" />
+      {/* Layer 4: Content Parallax Layer */}
+      <div className="astra-card-content flex flex-col justify-between">
         {children}
       </div>
     </div>
@@ -612,7 +802,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 font-sans selection:bg-blue-500/30 selection:text-blue-300 relative overflow-x-hidden">
-      <AstraCursor />
+      <GlobalCursorAura />
 
       <div 
         className="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-blue-500 via-cyan-400 to-indigo-500 z-[100] transition-all duration-150"
@@ -652,16 +842,18 @@ export default function App() {
 
       <AnimatePresence>
         {showBackToTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            onClick={scrollToTop}
-            className="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-blue-600/90 hover:bg-blue-500 text-white shadow-[0_0_25px_rgba(59,130,246,0.5)] border border-blue-400/40 backdrop-blur-md transition-all hover:-translate-y-1 group cursor-pointer"
-            aria-label="Back to top"
-          >
-            <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
-          </motion.button>
+          <Magnetic className="fixed bottom-6 right-6 z-40">
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              onClick={scrollToTop}
+              className="p-3 rounded-2xl bg-blue-600/90 hover:bg-blue-500 text-white shadow-[0_0_25px_rgba(59,130,246,0.5)] border border-blue-400/40 backdrop-blur-md transition-all hover:-translate-y-1 group cursor-pointer"
+              aria-label="Back to top"
+            >
+              <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
+            </motion.button>
+          </Magnetic>
         )}
       </AnimatePresence>
 
@@ -675,7 +867,7 @@ export default function App() {
 }
 
 // ----------------------------------------------------
-// Navigation Header
+// Navigation Header with Continuous Sliding Indicator & Magnetic Controls
 // ----------------------------------------------------
 function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -717,63 +909,82 @@ function Header() {
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#07090e]/92 backdrop-blur-xl border-b border-slate-800/80 py-3 shadow-2xl' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        <a href="#home" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:border-blue-400 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all duration-300">
-            <TerminalIcon className="w-5 h-5 group-hover:rotate-6 transition-transform" />
-          </div>
-          <div>
-            <div className="text-base font-bold tracking-tight text-white flex items-center gap-2 group-hover:text-blue-300 transition-colors">
-              <span>Abhishek Singh</span>
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+        <Magnetic strength={0.15} maxDisplacement={6}>
+          <a href="#home" className="flex items-center gap-3 group cursor-pointer">
+            <div className="w-10 h-10 rounded-xl bg-blue-600/15 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:border-blue-400 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all duration-300">
+              <TerminalIcon className="w-5 h-5 group-hover:rotate-6 transition-transform" />
             </div>
-            <p className="text-[11px] font-mono text-slate-400">Cloud & DevOps Engineer</p>
-          </div>
-        </a>
+            <div>
+              <div className="text-base font-bold tracking-tight text-white flex items-center gap-2 group-hover:text-blue-300 transition-colors">
+                <span>Abhishek Singh</span>
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              </div>
+              <p className="text-[11px] font-mono text-slate-400">Cloud & DevOps Engineer</p>
+            </div>
+          </a>
+        </Magnetic>
 
-        <nav className="hidden lg:flex items-center gap-1 bg-slate-900/70 p-1.5 rounded-full border border-slate-800/80 backdrop-blur-md shadow-inner">
-          {navItems.map((item) => (
-            <a
-              key={item.id}
-              href={item.href}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-300 relative ${
-                activeSection === item.id
-                  ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.6)] font-semibold'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
-              }`}
-            >
-              {item.label}
-            </a>
-          ))}
+        {/* Desktop Sliding Navigation */}
+        <nav className="hidden lg:flex items-center gap-1 bg-slate-900/70 p-1.5 rounded-full border border-slate-800/80 backdrop-blur-md shadow-inner relative">
+          {navItems.map((item) => {
+            const isActive = activeSection === item.id;
+            return (
+              <a
+                key={item.id}
+                href={item.href}
+                className={`relative px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors duration-200 z-10 ${
+                  isActive ? 'text-white font-semibold' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="nav-active-pill"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    className="absolute inset-0 rounded-full bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.6)] -z-10"
+                  />
+                )}
+                {item.label}
+              </a>
+            );
+          })}
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <a
-            href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 hover:border-blue-500 text-xs font-semibold tracking-wide transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] hover:-translate-y-0.5"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Resume</span>
-          </a>
-          <a
-            href="https://linkedin.com/in/abhishek-singh-4489ab265"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-[#0a66c2] text-slate-300 hover:text-white border border-slate-800 hover:border-[#0a66c2] transition-all hover:scale-105 shadow-md"
-            title="LinkedIn Profile"
-          >
-            <LinkedInIcon />
-          </a>
-          <a
-            href="https://github.com/7080dhiru-star"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-600 transition-all hover:scale-105 shadow-md"
-            title="GitHub Profile"
-          >
-            <GitHubIcon />
-          </a>
+          <Magnetic strength={0.25} maxDisplacement={6}>
+            <a
+              href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 hover:border-blue-500 text-xs font-semibold tracking-wide transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Resume</span>
+            </a>
+          </Magnetic>
+
+          <Magnetic strength={0.25} maxDisplacement={6}>
+            <a
+              href="https://linkedin.com/in/abhishek-singh-4489ab265"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-[#0a66c2] text-slate-300 hover:text-white border border-slate-800 hover:border-[#0a66c2] transition-all shadow-md inline-flex items-center justify-center cursor-pointer"
+              title="LinkedIn Profile"
+            >
+              <LinkedInIcon />
+            </a>
+          </Magnetic>
+
+          <Magnetic strength={0.25} maxDisplacement={6}>
+            <a
+              href="https://github.com/7080dhiru-star"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-600 transition-all shadow-md inline-flex items-center justify-center cursor-pointer"
+              title="GitHub Profile"
+            >
+              <GitHubIcon />
+            </a>
+          </Magnetic>
         </div>
 
         <button
@@ -825,7 +1036,7 @@ function Header() {
 }
 
 // ----------------------------------------------------
-// Hero Section with Orbiting Badges & Telemetry
+// Hero Section with Multi-Layer Mouse Parallax & Magnetic CTAs
 // ----------------------------------------------------
 function Hero({
   isVideoPlaying,
@@ -839,6 +1050,41 @@ function Hero({
   setShowVideoOverlay: (v: boolean) => void;
 }) {
   const [imageError, setImageError] = useState(false);
+  const visualRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const visual = visualRef.current;
+    if (!visual || window.matchMedia('(pointer: coarse)').matches) return;
+
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let animId: number;
+
+    const onMouseMove = (e: MouseEvent) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      targetX = ((e.clientX - centerX) / centerX) * 10;
+      targetY = ((e.clientY - centerY) / centerY) * 10;
+    };
+
+    const tick = () => {
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+
+      visual.style.transform = `translate3d(${-currentX.toFixed(2)}px, ${-currentY.toFixed(2)}px, 0)`;
+      animId = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    animId = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('mousemove', onMouseMove);
+    };
+  }, []);
 
   return (
     <section id="home" className="min-h-screen flex items-center justify-center pt-28 pb-16 relative">
@@ -919,33 +1165,39 @@ function Hero({
                 Results-driven <strong className="text-white font-semibold">Cloud Engineer</strong> with hands-on expertise across <strong className="text-blue-400 font-semibold">AWS</strong>, <strong className="text-blue-400 font-semibold">GCP</strong>, <strong className="text-blue-400 font-semibold">VMware ESXi virtualization</strong>, Linux administration (Ubuntu), and enterprise datacenter operations. Standardizing CI/CD provisioning to accelerate release velocity and ensure high availability.
               </p>
 
-              {/* Action Buttons */}
+              {/* Action Buttons with Magnetic Pull */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10">
-                <a
-                  href="#live-ops"
-                  className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm transition-all duration-300 shadow-[0_0_25px_rgba(6,182,212,0.35)] hover:shadow-[0_0_40px_rgba(6,182,212,0.65)] hover:-translate-y-1 cursor-pointer"
-                >
-                  <Video className="w-4 h-4" />
-                  <span>Watch Cloud Video Ops</span>
-                </a>
+                <Magnetic strength={0.25} maxDisplacement={8}>
+                  <a
+                    href="#live-ops"
+                    className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm transition-all duration-300 shadow-[0_0_25px_rgba(6,182,212,0.35)] hover:shadow-[0_0_40px_rgba(6,182,212,0.65)] cursor-pointer"
+                  >
+                    <Video className="w-4 h-4" />
+                    <span>Watch Cloud Video Ops</span>
+                  </a>
+                </Magnetic>
 
-                <a
-                  href="#architecture"
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-blue-500/50 font-semibold text-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/50 cursor-pointer"
-                >
-                  <Layers className="w-4 h-4 text-blue-400" />
-                  <span>Architecture Visualizer</span>
-                </a>
+                <Magnetic strength={0.25} maxDisplacement={8}>
+                  <a
+                    href="#architecture"
+                    className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-blue-500/50 font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-slate-900/50 cursor-pointer"
+                  >
+                    <Layers className="w-4 h-4 text-blue-400" />
+                    <span>Architecture Visualizer</span>
+                  </a>
+                </Magnetic>
                 
-                <a
-                  href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 text-sm font-medium transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
-                >
-                  <Download className="w-4 h-4 text-emerald-400" />
-                  <span>Resume (PDF)</span>
-                </a>
+                <Magnetic strength={0.25} maxDisplacement={8}>
+                  <a
+                    href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 text-sm font-medium transition-all duration-300 cursor-pointer"
+                  >
+                    <Download className="w-4 h-4 text-emerald-400" />
+                    <span>Resume (PDF)</span>
+                  </a>
+                </Magnetic>
               </div>
 
               {/* Quick Tech Highlights */}
@@ -966,13 +1218,14 @@ function Hero({
             </motion.div>
           </div>
 
-          {/* Right Hero Visual & Profile Image with Orbiting Badges */}
+          {/* Right Hero Visual & Profile Image with Orbiting Badges & Parallax */}
           <div className="lg:col-span-5 flex justify-center">
             <motion.div
+              ref={visualRef}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative"
+              className="relative transition-transform duration-100 ease-out"
             >
               <div className="absolute inset-0 rounded-full border border-blue-500/20 animate-ping [animation-duration:4s] pointer-events-none" />
               <div className="absolute -inset-4 rounded-full border border-cyan-500/20 [animation-duration:6s] pointer-events-none" />
@@ -2235,20 +2488,24 @@ function ProjectsSection() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={prevSlide}
-              className="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 transition-all hover:scale-105 cursor-pointer shadow-md"
-              aria-label="Previous project"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={nextSlide}
-              className="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 transition-all hover:scale-105 cursor-pointer shadow-md"
-              aria-label="Next project"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            <Magnetic strength={0.3} maxDisplacement={6}>
+              <button
+                onClick={prevSlide}
+                className="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 transition-all cursor-pointer shadow-md inline-flex items-center justify-center"
+                aria-label="Previous project"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            </Magnetic>
+            <Magnetic strength={0.3} maxDisplacement={6}>
+              <button
+                onClick={nextSlide}
+                className="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 transition-all cursor-pointer shadow-md inline-flex items-center justify-center"
+                aria-label="Next project"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </Magnetic>
           </div>
         </div>
 
@@ -2542,33 +2799,39 @@ function ContactSection() {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
-            <a
-              href="mailto:7080dhiru@gmail.com"
-              className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.65)] hover:-translate-y-1 cursor-pointer"
-            >
-              <Mail className="w-4 h-4" />
-              <span>7080dhiru@gmail.com</span>
-            </a>
+            <Magnetic strength={0.25} maxDisplacement={8}>
+              <a
+                href="mailto:7080dhiru@gmail.com"
+                className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.65)] cursor-pointer"
+              >
+                <Mail className="w-4 h-4" />
+                <span>7080dhiru@gmail.com</span>
+              </a>
+            </Magnetic>
 
-            <a
-              href="https://linkedin.com/in/abhishek-singh-4489ab265"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-900/40 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
-            >
-              <LinkedInIcon />
-              <span>Connect on LinkedIn</span>
-            </a>
+            <Magnetic strength={0.25} maxDisplacement={8}>
+              <a
+                href="https://linkedin.com/in/abhishek-singh-4489ab265"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-900/40 hover:shadow-xl cursor-pointer"
+              >
+                <LinkedInIcon />
+                <span>Connect on LinkedIn</span>
+              </a>
+            </Magnetic>
 
-            <a
-              href="https://github.com/7080dhiru-star"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2.5 px-6 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-500 font-bold text-sm transition-all hover:-translate-y-1 shadow-md cursor-pointer"
-            >
-              <GitHubIcon />
-              <span>GitHub Profile</span>
-            </a>
+            <Magnetic strength={0.25} maxDisplacement={8}>
+              <a
+                href="https://github.com/7080dhiru-star"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 px-6 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-500 font-bold text-sm transition-all shadow-md cursor-pointer"
+              >
+                <GitHubIcon />
+                <span>GitHub Profile</span>
+              </a>
+            </Magnetic>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-mono">
