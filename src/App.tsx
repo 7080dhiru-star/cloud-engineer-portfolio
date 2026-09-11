@@ -5,7 +5,8 @@ import {
   ChevronDown, ExternalLink, Download, Mail, Phone, MapPin,
   Menu, X, FileText, Cpu, Network, Briefcase, GraduationCap,
   Layers, HardDrive, CheckCircle2, Lock, Zap, Clock, ArrowRight,
-  TrendingUp, Award, RefreshCw, Eye, ArrowUp, Sparkles, Check
+  TrendingUp, Award, RefreshCw, Eye, ArrowUp, Sparkles, Check,
+  Play, Pause, EyeOff, Radio, Sliders
 } from 'lucide-react';
 import profilePhoto from './assets/Abhishek_Singh_JPG.jpg';
 
@@ -28,10 +29,243 @@ const GitHubIcon = () => (
   </svg>
 );
 
+// ----------------------------------------------------
+// Pro Cloud Services Video & Cyber Infrastructure Background
+// ----------------------------------------------------
+function CloudServicesBackground({ 
+  isVideoPlaying, 
+  showVideoOverlay 
+}: { 
+  isVideoPlaying: boolean; 
+  showVideoOverlay: boolean; 
+}) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [videoError, setVideoError] = useState(false);
+
+
+
+  // Handle Play/Pause
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.play().catch(() => {});
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isVideoPlaying]);
+
+  // Interactive 3D Cyber Server Rack & Cloud Mesh Engine
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Mouse tracking
+    let mouse = { x: width / 2, y: height / 2, active: false };
+    const handleMouseMove = (e: MouseEvent) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.active = true;
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Cloud Data Nodes
+    const nodeLabels = ['AWS::VPC', 'GCP::AlloyDB', 'VMware::ESXi', 'K8s::Cluster', 'Ubuntu::Prod', 'CI/CD::Runner', 'AWS::RDS', 'Cloudflare::DNS', 'Fortinet::IAM'];
+    const nodes: Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      radius: number;
+      label: string;
+      pulse: number;
+      color: string;
+    }> = [];
+
+    const colors = ['#38bdf8', '#3b82f6', '#10b981', '#a855f7', '#06b6d4'];
+
+    for (let i = 0; i < 22; i++) {
+      nodes.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        radius: Math.random() * 2.5 + 2,
+        label: nodeLabels[i % nodeLabels.length],
+        pulse: Math.random() * Math.PI * 2,
+        color: colors[i % colors.length]
+      });
+    }
+
+    // Server rack corridor columns
+    let frame = 0;
+
+    const render = () => {
+      frame++;
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw subtle cyber perspective grid on the floor
+      const horizonY = height * 0.45;
+      ctx.strokeStyle = 'rgba(30, 58, 138, 0.12)';
+      ctx.lineWidth = 1;
+
+      // Perspective lines converging to center horizon
+      const vanishX = width * 0.5 + (mouse.x - width / 2) * 0.05;
+      for (let x = -width * 0.5; x <= width * 1.5; x += width * 0.1) {
+        ctx.beginPath();
+        ctx.moveTo(vanishX, horizonY);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+
+      // Horizontal floor grid lines moving forward
+      const gridOffset = (frame * 0.4) % 40;
+      for (let y = horizonY + gridOffset; y < height; y += 40) {
+        const factor = (y - horizonY) / (height - horizonY);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.strokeStyle = `rgba(59, 130, 246, ${0.03 + factor * 0.09})`;
+        ctx.stroke();
+      }
+
+      // Draw Interconnected Cloud Nodes & Pulses
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        n.x += n.vx;
+        n.y += n.vy;
+        n.pulse += 0.03;
+
+        // Bounce off screen boundaries
+        if (n.x < 0 || n.x > width) n.vx *= -1;
+        if (n.y < 0 || n.y > height) n.vy *= -1;
+
+        // Mouse avoidance/gravitation
+        const dx = mouse.x - n.x;
+        const dy = mouse.y - n.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 180 && mouse.active) {
+          n.x -= (dx / dist) * 0.6;
+          n.y -= (dy / dist) * 0.6;
+        }
+
+        // Draw connections between near nodes
+        for (let j = i + 1; j < nodes.length; j++) {
+          const n2 = nodes[j];
+          const dist2 = Math.hypot(n.x - n2.x, n.y - n2.y);
+          if (dist2 < 170) {
+            const alpha = (1 - dist2 / 170) * 0.22;
+            ctx.beginPath();
+            ctx.moveTo(n.x, n.y);
+            ctx.lineTo(n2.x, n2.y);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Moving data packet along line
+            if ((frame + i * 10) % 120 === 0) {
+              const packetPos = ((frame * 0.02) % 1);
+              const px = n.x + (n2.x - n.x) * packetPos;
+              const py = n.y + (n2.y - n.y) * packetPos;
+              ctx.beginPath();
+              ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+              ctx.fillStyle = '#38bdf8';
+              ctx.shadowColor = '#38bdf8';
+              ctx.shadowBlur = 6;
+              ctx.fill();
+              ctx.shadowBlur = 0;
+            }
+          }
+        }
+
+        // Draw node body
+        ctx.beginPath();
+        const pulseSize = n.radius + Math.sin(n.pulse) * 0.8;
+        ctx.arc(n.x, n.y, pulseSize, 0, Math.PI * 2);
+        ctx.fillStyle = n.color;
+        ctx.shadowColor = n.color;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Draw label for key nodes
+        if (i % 3 === 0) {
+          ctx.font = '9px monospace';
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
+          ctx.fillText(n.label, n.x + 8, n.y + 3);
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
+      {/* 1. Real-time Background Cloud Video Stream Layer */}
+      {showVideoOverlay && !videoError && (
+        <div className="absolute inset-0 z-0">
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            onError={() => setVideoError(true)}
+            className="w-full h-full object-cover object-center opacity-30 mix-blend-screen scale-105 transition-opacity duration-1000"
+          >
+            {/* Multi-CDN Ultra HD Cloud / Datacenter Stream Sources with Fallback */}
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-graphs-and-data-31913-large.mp4" type="video/mp4" />
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-futuristic-technology-digital-interface-31912-large.mp4" type="video/mp4" />
+            <source src={getAssetUrl('cloud-bg.mp4')} type="video/mp4" />
+          </video>
+        </div>
+      )}
+
+      {/* 2. Interactive 3D Cyber Infrastructure Canvas Engine */}
+      <canvas 
+        ref={canvasRef} 
+        className="absolute inset-0 w-full h-full opacity-65 z-[1]"
+      />
+
+      {/* 3. Deep Cyber Vignette & Contrast Protection Layer */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07090e]/85 via-[#07090e]/75 to-[#07090e] z-[2]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_30%,transparent_20%,#07090e_90%)] z-[2]" />
+
+      {/* 4. Fine Digital Scanline Texture */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-25 z-[3]" />
+    </div>
+  );
+}
+
 export default function App() {
   const [selectedCert, setSelectedCert] = useState<{ name: string; issuer: string; id?: string; file: string | null } | null>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const [showVideoOverlay, setShowVideoOverlay] = useState(true);
 
   useEffect(() => {
     // Ensure initial scroll position starts at top of page
@@ -60,18 +294,21 @@ export default function App() {
         style={{ width: `${scrollProgress}%` }}
       />
 
-      {/* Dynamic Cyber Grid Background */}
-      <div className="fixed inset-0 pointer-events-none opacity-20 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] z-0" />
-      
-      {/* Ambient Radial Glows */}
-      <div className="fixed top-0 left-1/4 w-[32rem] h-[32rem] bg-blue-500/10 rounded-full blur-3xl pointer-events-none z-0 animate-pulse" />
-      <div className="fixed bottom-1/3 right-10 w-[30rem] h-[30rem] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none z-0" />
-      <div className="fixed top-2/3 left-10 w-[24rem] h-[24rem] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none z-0" />
+      {/* Pro Cloud Services Video & Cyber Infrastructure Background */}
+      <CloudServicesBackground 
+        isVideoPlaying={isVideoPlaying} 
+        showVideoOverlay={showVideoOverlay}
+      />
 
       <Header />
       
       <main className="relative z-10">
-        <Hero />
+        <Hero 
+          isVideoPlaying={isVideoPlaying}
+          setIsVideoPlaying={setIsVideoPlaying}
+          showVideoOverlay={showVideoOverlay}
+          setShowVideoOverlay={setShowVideoOverlay}
+        />
         <StatsBar />
         <InteractiveTerminal />
         <ArchitectureVisualizer />
@@ -96,7 +333,7 @@ export default function App() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-blue-600/90 hover:bg-blue-500 text-white shadow-[0_0_25px_rgba(59,130,246,0.5)] border border-blue-400/40 backdrop-blur-md transition-all hover:-translate-y-1 group"
+            className="fixed bottom-6 right-6 z-40 p-3 rounded-2xl bg-blue-600/90 hover:bg-blue-500 text-white shadow-[0_0_25px_rgba(59,130,246,0.5)] border border-blue-400/40 backdrop-blur-md transition-all hover:-translate-y-1 group cursor-pointer"
             aria-label="Back to top"
           >
             <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
@@ -189,7 +426,7 @@ function Header() {
         {/* Action CTAs */}
         <div className="hidden md:flex items-center gap-3">
           <a
-            href={getAssetUrl('Abhishek_Singh_Resume_30-08-2026.pdf')}
+            href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 hover:border-blue-500 text-xs font-semibold tracking-wide transition-all duration-300 shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] hover:-translate-y-0.5"
@@ -220,7 +457,7 @@ function Header() {
         {/* Mobile Hamburger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden p-2.5 rounded-xl bg-slate-900 text-slate-300 border border-slate-800 hover:text-white transition-colors"
+          className="lg:hidden p-2.5 rounded-xl bg-slate-900 text-slate-300 border border-slate-800 hover:text-white transition-colors cursor-pointer"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -251,12 +488,12 @@ function Header() {
               ))}
               <div className="pt-4 mt-2 border-t border-slate-800/80 flex flex-col gap-3">
                 <a
-                  href={getAssetUrl('Abhishek_Singh_Resume_30-08-2026.pdf')}
+                  href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm shadow-lg shadow-blue-500/25"
                 >
-                  <Download className="w-4 h-4" /> Download Official Resume
+                  <Download className="w-4 h-4" /> Download Official Resume (PDF)
                 </a>
               </div>
             </div>
@@ -268,14 +505,75 @@ function Header() {
 }
 
 // ----------------------------------------------------
-// Hero Section
+// Hero Section with Cloud Video HUD Telemetry
 // ----------------------------------------------------
-function Hero() {
+function Hero({
+  isVideoPlaying,
+  setIsVideoPlaying,
+  showVideoOverlay,
+  setShowVideoOverlay
+}: {
+  isVideoPlaying: boolean;
+  setIsVideoPlaying: (v: boolean) => void;
+  showVideoOverlay: boolean;
+  setShowVideoOverlay: (v: boolean) => void;
+}) {
   const [imageError, setImageError] = useState(false);
 
   return (
     <section id="home" className="min-h-screen flex items-center justify-center pt-28 pb-16 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+        
+        {/* Live Cloud Video Telemetry HUD Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8 p-2 sm:p-2.5 rounded-2xl bg-slate-950/70 border border-blue-900/40 backdrop-blur-xl flex flex-wrap items-center justify-between gap-3 shadow-2xl max-w-4xl mx-auto lg:mx-0"
+        >
+          <div className="flex items-center gap-3 px-2">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <div className="flex items-center gap-2 text-[11px] font-mono font-semibold text-slate-300">
+              <span className="text-blue-400">CLOUD INFRASTRUCTURE FEED:</span>
+              <span className="text-emerald-400">LIVE STREAM</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 text-[11px] font-mono text-slate-400">
+            <span className="hidden sm:inline text-slate-500">|</span>
+            <div className="hidden sm:flex items-center gap-1.5">
+              <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+              <span>AWS / GCP MESH</span>
+            </div>
+            <span className="hidden md:inline text-slate-500">|</span>
+            <div className="hidden md:flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-emerald-400" />
+              <span>SLA: 99.9%</span>
+            </div>
+
+            {/* Video Controls Toggle */}
+            <div className="flex items-center gap-1 ml-auto bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+              <button
+                onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                title={isVideoPlaying ? "Pause Background Stream" : "Play Background Stream"}
+              >
+                {isVideoPlaying ? <Pause className="w-3.5 h-3.5 text-blue-400" /> : <Play className="w-3.5 h-3.5 text-emerald-400" />}
+              </button>
+              <button
+                onClick={() => setShowVideoOverlay(!showVideoOverlay)}
+                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                title={showVideoOverlay ? "Switch to 3D Cyber Mesh" : "Enable Video Overlay"}
+              >
+                {showVideoOverlay ? <Sliders className="w-3.5 h-3.5 text-cyan-400" /> : <EyeOff className="w-3.5 h-3.5 text-slate-500" />}
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
           {/* Left Hero Details */}
@@ -307,25 +605,25 @@ function Hero() {
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10">
                 <a
                   href="#architecture"
-                  className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm transition-all shadow-[0_0_25px_rgba(59,130,246,0.35)] hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] hover:-translate-y-1"
+                  className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm transition-all shadow-[0_0_25px_rgba(59,130,246,0.35)] hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] hover:-translate-y-1 cursor-pointer"
                 >
                   <Layers className="w-4 h-4" />
                   <span>Explore Architecture</span>
                 </a>
                 
                 <a
-                  href={getAssetUrl('Abhishek_Singh_Resume_30-08-2026.pdf')}
+                  href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-blue-500/50 font-semibold text-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/50"
+                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-blue-500/50 font-semibold text-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/50 cursor-pointer"
                 >
                   <Download className="w-4 h-4 text-blue-400" />
-                  <span>Download Resume</span>
+                  <span>Download Resume (PDF)</span>
                 </a>
 
                 <a
                   href="#contact"
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/60 text-slate-400 hover:text-white border border-transparent hover:border-slate-800 text-sm font-medium transition-all hover:-translate-y-0.5"
+                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/60 text-slate-400 hover:text-white border border-transparent hover:border-slate-800 text-sm font-medium transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
                   <span>Let's Connect</span>
                   <ArrowRight className="w-4 h-4" />
@@ -445,7 +743,7 @@ function StatsBar() {
   ];
 
   return (
-    <section className="py-8 bg-[#0b0f19] border-y border-slate-800/80">
+    <section className="py-8 bg-[#0b0f19] border-y border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, idx) => (
@@ -553,7 +851,7 @@ function InteractiveTerminal() {
   const quickCommands = ['help', 'whoami', 'skills', 'infra', 'experience', 'certs', 'contact'];
 
   return (
-    <section id="terminal" className="py-20 bg-[#07090e] relative">
+    <section id="terminal" className="py-20 bg-[#07090e]/90 relative z-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -577,7 +875,7 @@ function InteractiveTerminal() {
             <button
               key={q}
               onClick={() => executeCommand(q)}
-              className="px-3 py-1 rounded-lg bg-slate-900 hover:bg-blue-600 hover:text-white text-blue-400 border border-slate-800 hover:border-blue-500 text-xs font-mono transition-all duration-200 shadow-sm hover:scale-105 active:scale-95"
+              className="px-3 py-1 rounded-lg bg-slate-900 hover:bg-blue-600 hover:text-white text-blue-400 border border-slate-800 hover:border-blue-500 text-xs font-mono transition-all duration-200 shadow-sm hover:scale-105 active:scale-95 cursor-pointer"
             >
               ${q}
             </button>
@@ -590,7 +888,7 @@ function InteractiveTerminal() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5 }}
-          className="rounded-2xl bg-[#090d16] border border-slate-800 hover:border-blue-500/40 hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] transition-all duration-300 shadow-2xl overflow-hidden font-mono text-sm"
+          className="rounded-2xl bg-[#090d16]/95 border border-slate-800 hover:border-blue-500/40 hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] transition-all duration-300 shadow-2xl overflow-hidden font-mono text-sm"
         >
           {/* Terminal Titlebar */}
           <div className="px-4 py-3 bg-[#0d121f] border-b border-slate-800 flex items-center justify-between">
@@ -708,7 +1006,7 @@ function ArchitectureVisualizer() {
   ];
 
   return (
-    <section id="architecture" className="py-24 bg-[#0a0d16] border-t border-slate-800/80 relative">
+    <section id="architecture" className="py-24 bg-[#0a0d16]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -811,7 +1109,7 @@ function ArchitectureVisualizer() {
 // ----------------------------------------------------
 function AboutSection() {
   return (
-    <section id="about" className="py-24 bg-[#07090e] relative">
+    <section id="about" className="py-24 bg-[#07090e]/95 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
@@ -1034,7 +1332,7 @@ function SkillsMatrix() {
   ];
 
   return (
-    <section id="skills" className="py-24 bg-[#0a0d16] border-t border-slate-800/80">
+    <section id="skills" className="py-24 bg-[#0a0d16]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -1132,7 +1430,7 @@ function CareerJourney() {
   ];
 
   return (
-    <section id="career" className="py-24 bg-[#07090e] border-t border-slate-800/80">
+    <section id="career" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -1217,7 +1515,7 @@ function CareerJourney() {
 // ----------------------------------------------------
 function DatacenterSection() {
   return (
-    <section className="py-20 bg-[#0a0d16] border-t border-slate-800/80">
+    <section className="py-20 bg-[#0a0d16]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
@@ -1311,7 +1609,7 @@ function DatacenterSection() {
 // ----------------------------------------------------
 function ProjectsSection() {
   return (
-    <section id="projects" className="py-24 bg-[#07090e] border-t border-slate-800/80">
+    <section id="projects" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -1431,7 +1729,7 @@ function CertificationsSection({ onSelectCert }: { onSelectCert: (cert: any) => 
   ];
 
   return (
-    <section id="certifications" className="py-24 bg-[#0a0d16] border-t border-slate-800/80">
+    <section id="certifications" className="py-24 bg-[#0a0d16]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -1490,7 +1788,7 @@ function CertificationsSection({ onSelectCert }: { onSelectCert: (cert: any) => 
                   <>
                     <button
                       onClick={() => onSelectCert(cert)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 text-xs font-semibold transition-all hover:scale-105"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 text-xs font-semibold transition-all hover:scale-105 cursor-pointer"
                     >
                       <Eye className="w-3.5 h-3.5" /> View PDF
                     </button>
@@ -1530,7 +1828,7 @@ function PhilosophySection() {
   ];
 
   return (
-    <section className="py-20 bg-[#07090e] border-t border-slate-800/80">
+    <section className="py-20 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -1571,7 +1869,7 @@ function PhilosophySection() {
 // ----------------------------------------------------
 function EducationSection() {
   return (
-    <section id="education" className="py-20 bg-[#0a0d16] border-t border-slate-800/80">
+    <section id="education" className="py-20 bg-[#0a0d16]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
@@ -1605,7 +1903,7 @@ function EducationSection() {
 // ----------------------------------------------------
 function ContactSection() {
   return (
-    <section id="contact" className="py-24 bg-[#07090e] border-t border-slate-800/80 relative overflow-hidden">
+    <section id="contact" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(37,99,235,0.08),transparent)] pointer-events-none" />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -1631,7 +1929,7 @@ function ContactSection() {
           <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
             <a
               href="mailto:7080dhiru@gmail.com"
-              className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.65)] hover:-translate-y-1"
+              className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition-all duration-300 shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.65)] hover:-translate-y-1 cursor-pointer"
             >
               <Mail className="w-4 h-4" />
               <span>7080dhiru@gmail.com</span>
@@ -1641,7 +1939,7 @@ function ContactSection() {
               href="https://linkedin.com/in/abhishek-singh-4489ab265"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-900/40 hover:-translate-y-1 hover:shadow-xl"
+              className="flex items-center gap-2.5 px-7 py-4 rounded-2xl bg-[#0a66c2] hover:bg-[#004182] text-white font-bold text-sm transition-all duration-300 shadow-lg shadow-blue-900/40 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
             >
               <LinkedInIcon />
               <span>Connect on LinkedIn</span>
@@ -1651,7 +1949,7 @@ function ContactSection() {
               href="https://github.com/7080dhiru-star"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 px-6 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-500 font-bold text-sm transition-all hover:-translate-y-1 shadow-md"
+              className="flex items-center gap-2.5 px-6 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-500 font-bold text-sm transition-all hover:-translate-y-1 shadow-md cursor-pointer"
             >
               <GitHubIcon />
               <span>GitHub Profile</span>
@@ -1684,12 +1982,12 @@ function ContactSection() {
 // ----------------------------------------------------
 function Footer() {
   return (
-    <footer className="py-8 bg-[#05070a] border-t border-slate-900 text-center text-xs text-slate-500 font-mono">
+    <footer className="py-8 bg-[#05070a] border-t border-slate-900 text-center text-xs text-slate-500 font-mono relative z-10">
       <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>© {new Date().getFullYear()} Abhishek Singh. All rights reserved.</div>
         <div className="flex items-center gap-4">
           <a href="#home" className="hover:text-blue-400 transition-colors">Back to Top ↑</a>
-          <a href={getAssetUrl('Abhishek_Singh_Resume_30-08-2026.pdf')} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">Download Resume</a>
+          <a href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">Download Resume (PDF)</a>
         </div>
       </div>
     </footer>
@@ -1719,7 +2017,7 @@ function CertificateModal({ cert, onClose }: { cert: { name: string; issuer: str
       >
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-colors hover:scale-105"
+          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white transition-colors hover:scale-105 cursor-pointer"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -1758,14 +2056,14 @@ function CertificateModal({ cert, onClose }: { cert: { name: string; issuer: str
                 href={pdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition-all hover:scale-105"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 cursor-pointer"
               >
                 <ExternalLink className="w-4 h-4" /> Open Fullscreen PDF
               </a>
               <a
                 href={pdfUrl}
                 download
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all hover:scale-105"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all hover:scale-105 cursor-pointer"
               >
                 <Download className="w-4 h-4" /> Download Certificate
               </a>
