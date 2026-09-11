@@ -4,9 +4,10 @@ import {
   Cloud, Server, Shield, Activity, Terminal as TerminalIcon, 
   ChevronDown, ExternalLink, Download, Mail, Phone, MapPin,
   Menu, X, FileText, Cpu, Network, Briefcase, GraduationCap,
-  Layers, HardDrive, CheckCircle2, Lock, Zap, Clock, ArrowRight,
-  TrendingUp, Award, RefreshCw, Eye, ArrowUp, Sparkles, Check,
-  Play, Pause, EyeOff, Radio, Sliders
+  Layers, HardDrive, CheckCircle2, Lock, Zap, Clock,
+  TrendingUp, Award, RefreshCw, Eye, ArrowUp, Check,
+  Play, Pause, EyeOff, Radio, Sliders, ChevronLeft, ChevronRight,
+  Video
 } from 'lucide-react';
 import profilePhoto from './assets/Abhishek_Singh_JPG.jpg';
 
@@ -19,7 +20,7 @@ const getAssetUrl = (filename: string) => {
 // Social Icons as SVGs for reliability
 const LinkedInIcon = () => (
   <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.22a1.6 1.6 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0-1.6-1.6Z" />
+    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.22a1.6 1.6 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0-1.6-1.6Z" />
   </svg>
 );
 
@@ -28,6 +29,129 @@ const GitHubIcon = () => (
     <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
   </svg>
 );
+
+// ----------------------------------------------------
+// Advanced Cyber Mouse Cursor Engine
+// ----------------------------------------------------
+function CyberCursor() {
+  const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
+  const [lagPos, setLagPos] = useState({ x: -100, y: -100 });
+  const [cursorType, setCursorType] = useState<'default' | 'pointer' | 'video' | 'slide' | 'terminal'>('default');
+  const [cursorLabel, setCursorLabel] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    // Check if device is touch-first
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+      setIsTouch(true);
+      return;
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+      setIsVisible(true);
+
+      // Check hovered element
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      const interactive = target.closest('button, a, input, [data-cursor]');
+      const videoArea = target.closest('[data-cursor="video"]');
+      const slideArea = target.closest('[data-cursor="slide"]');
+      const terminalArea = target.closest('[data-cursor="terminal"]');
+
+      if (videoArea) {
+        setCursorType('video');
+        setCursorLabel('STREAM');
+      } else if (slideArea) {
+        setCursorType('slide');
+        setCursorLabel('SLIDE');
+      } else if (terminalArea) {
+        setCursorType('terminal');
+        setCursorLabel('>_ CLI');
+      } else if (interactive) {
+        setCursorType('pointer');
+        setCursorLabel('EXPLORE');
+      } else {
+        setCursorType('default');
+        setCursorLabel('');
+      }
+    };
+
+    const handleMouseLeave = () => setIsVisible(false);
+    const handleMouseEnter = () => setIsVisible(true);
+
+    window.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseleave', handleMouseLeave);
+    document.addEventListener('mouseenter', handleMouseEnter);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('mouseenter', handleMouseEnter);
+    };
+  }, []);
+
+  // Smooth lag interpolation for the outer trailing radar ring
+  useEffect(() => {
+    if (isTouch) return;
+    let animId: number;
+    const updateLag = () => {
+      setLagPos((prev) => ({
+        x: prev.x + (mousePos.x - prev.x) * 0.18,
+        y: prev.y + (mousePos.y - prev.y) * 0.18,
+      }));
+      animId = requestAnimationFrame(updateLag);
+    };
+    animId = requestAnimationFrame(updateLag);
+    return () => cancelAnimationFrame(animId);
+  }, [mousePos, isTouch]);
+
+  if (isTouch || !isVisible) return null;
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden select-none">
+      {/* Precision Core Point */}
+      <div
+        className="fixed w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_12px_#38bdf8] transition-transform duration-75 -translate-x-1/2 -translate-y-1/2"
+        style={{ left: `${mousePos.x}px`, top: `${mousePos.y}px` }}
+      />
+
+      {/* Trailing Outer Cyber Radar Ring */}
+      <div
+        className={`fixed rounded-full border transition-all duration-300 flex items-center justify-center -translate-x-1/2 -translate-y-1/2 backdrop-blur-[1px] ${
+          cursorType === 'pointer'
+            ? 'w-14 h-14 border-blue-400 bg-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.5)] scale-110'
+            : cursorType === 'video'
+            ? 'w-16 h-16 border-emerald-400 bg-emerald-500/20 shadow-[0_0_25px_rgba(16,185,129,0.5)] scale-125'
+            : cursorType === 'slide'
+            ? 'w-16 h-16 border-amber-400 bg-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.5)] scale-115'
+            : cursorType === 'terminal'
+            ? 'w-14 h-14 border-purple-400 bg-purple-500/20 shadow-[0_0_20px_rgba(168,85,247,0.5)] scale-110'
+            : 'w-8 h-8 border-cyan-400/50 bg-cyan-500/5'
+        }`}
+        style={{ left: `${lagPos.x}px`, top: `${lagPos.y}px` }}
+      >
+        {cursorLabel && (
+          <span className="text-[9px] font-mono font-bold tracking-widest text-cyan-300 drop-shadow">
+            {cursorLabel}
+          </span>
+        )}
+      </div>
+
+      {/* Crosshair telemetry coordinates HUD */}
+      {cursorType === 'default' && (
+        <div
+          className="fixed text-[8px] font-mono text-slate-500 tracking-tighter -translate-y-6 translate-x-4 pointer-events-none opacity-60"
+          style={{ left: `${mousePos.x}px`, top: `${mousePos.y}px` }}
+        >
+          X:{Math.round(mousePos.x)} Y:{Math.round(mousePos.y)}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ----------------------------------------------------
 // Pro Cloud Services Video & Cyber Infrastructure Background
@@ -42,8 +166,6 @@ function CloudServicesBackground({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [videoError, setVideoError] = useState(false);
-
-
 
   // Handle Play/Pause
   useEffect(() => {
@@ -111,7 +233,6 @@ function CloudServicesBackground({
       });
     }
 
-    // Server rack corridor columns
     let frame = 0;
 
     const render = () => {
@@ -236,7 +357,6 @@ function CloudServicesBackground({
             onError={() => setVideoError(true)}
             className="w-full h-full object-cover object-center opacity-30 mix-blend-screen scale-105 transition-opacity duration-1000"
           >
-            {/* Multi-CDN Ultra HD Cloud / Datacenter Stream Sources with Fallback */}
             <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-graphs-and-data-31913-large.mp4" type="video/mp4" />
             <source src="https://assets.mixkit.co/videos/preview/mixkit-futuristic-technology-digital-interface-31912-large.mp4" type="video/mp4" />
             <source src={getAssetUrl('cloud-bg.mp4')} type="video/mp4" />
@@ -288,6 +408,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 font-sans selection:bg-blue-500/30 selection:text-blue-300 relative overflow-x-hidden">
+      {/* Advanced Cyber Mouse Cursor */}
+      <CyberCursor />
+
       {/* Top Scroll Progress Bar */}
       <div 
         className="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-blue-500 via-cyan-400 to-indigo-500 z-[100] transition-all duration-150"
@@ -310,6 +433,7 @@ export default function App() {
           setShowVideoOverlay={setShowVideoOverlay}
         />
         <StatsBar />
+        <CloudOpsLiveCenter />
         <InteractiveTerminal />
         <ArchitectureVisualizer />
         <AboutSection />
@@ -363,7 +487,7 @@ function Header() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 30);
       
-      const sections = ['home', 'terminal', 'architecture', 'about', 'skills', 'career', 'projects', 'certifications', 'contact'];
+      const sections = ['home', 'live-ops', 'terminal', 'architecture', 'about', 'skills', 'career', 'projects', 'certifications', 'contact'];
       for (const section of sections) {
         const el = document.getElementById(section);
         if (el) {
@@ -381,11 +505,12 @@ function Header() {
 
   const navItems = [
     { label: 'Overview', href: '#home', id: 'home' },
+    { label: 'Cloud Video Ops', href: '#live-ops', id: 'live-ops' },
     { label: 'Shell', href: '#terminal', id: 'terminal' },
     { label: 'Architecture', href: '#architecture', id: 'architecture' },
     { label: 'Skills', href: '#skills', id: 'skills' },
     { label: 'Career', href: '#career', id: 'career' },
-    { label: 'Projects', href: '#projects', id: 'projects' },
+    { label: 'Projects Slide', href: '#projects', id: 'projects' },
     { label: 'Certs', href: '#certifications', id: 'certifications' },
     { label: 'Contact', href: '#contact', id: 'contact' },
   ];
@@ -604,29 +729,29 @@ function Hero({
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10">
                 <a
-                  href="#architecture"
-                  className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm transition-all shadow-[0_0_25px_rgba(59,130,246,0.35)] hover:shadow-[0_0_40px_rgba(59,130,246,0.6)] hover:-translate-y-1 cursor-pointer"
+                  href="#live-ops"
+                  className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm transition-all shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_40px_rgba(6,182,212,0.7)] hover:-translate-y-1 cursor-pointer"
                 >
-                  <Layers className="w-4 h-4" />
-                  <span>Explore Architecture</span>
+                  <Video className="w-4 h-4" />
+                  <span>Watch Cloud Video Ops</span>
+                </a>
+
+                <a
+                  href="#architecture"
+                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-blue-500/50 font-semibold text-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/50 cursor-pointer"
+                >
+                  <Layers className="w-4 h-4 text-blue-400" />
+                  <span>Architecture Visualizer</span>
                 </a>
                 
                 <a
                   href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-blue-500/50 font-semibold text-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/50 cursor-pointer"
+                  className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 text-sm font-medium transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
-                  <Download className="w-4 h-4 text-blue-400" />
-                  <span>Download Resume (PDF)</span>
-                </a>
-
-                <a
-                  href="#contact"
-                  className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-transparent hover:bg-slate-900/60 text-slate-400 hover:text-white border border-transparent hover:border-slate-800 text-sm font-medium transition-all hover:-translate-y-0.5 cursor-pointer"
-                >
-                  <span>Let's Connect</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <Download className="w-4 h-4 text-emerald-400" />
+                  <span>Resume (PDF)</span>
                 </a>
               </div>
 
@@ -772,6 +897,351 @@ function StatsBar() {
 }
 
 // ----------------------------------------------------
+// Dedicated Live Cloud Video & Architecture Operations Center
+// ----------------------------------------------------
+function CloudOpsLiveCenter() {
+  const [activeChannel, setActiveChannel] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [speed, setSpeed] = useState<'1x' | '2x'>('1x');
+  const [slideProgress, setSlideProgress] = useState(0);
+
+  const channels = [
+    {
+      id: "ch-aws",
+      title: "AWS Multi-Region VPC & RDS Failover Topology",
+      category: "Multi-Cloud Architecture",
+      sla: "99.9% Production SLA",
+      metrics: { latency: "14ms", throughput: "1.4 GB/s", state: "HEALTHY", region: "us-east-1 & ap-south-1" },
+      videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-graphs-and-data-31913-large.mp4",
+      posterBg: "from-blue-950 via-slate-900 to-indigo-950",
+      description: "Live telemetry stream of multi-cloud VPC peering, EC2 autoscaling groups, and multi-AZ RDS database replication ensuring continuous 99.9% uptime SLA.",
+      logs: [
+        "[AWS::VPC] Routing tables synchronized across subnets.",
+        "[AWS::RDS] Multi-AZ heartbeat acknowledged: 0ms sync lag.",
+        "[AWS::IAM] Least-privilege role validation passed for 48 instances."
+      ]
+    },
+    {
+      id: "ch-vmware",
+      title: "VMware ESXi Hypervisor & Datacenter Storage Cluster",
+      category: "Virtualization & Bare-Metal",
+      sla: "Bare-Metal Active",
+      metrics: { latency: "0.8ms", throughput: "4.8 GB/s", state: "OPTIMAL", region: "On-Premises Datacenter" },
+      videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-futuristic-technology-digital-interface-31912-large.mp4",
+      posterBg: "from-emerald-950 via-slate-900 to-teal-950",
+      description: "Direct hypervisor virtualization console: managing VM provisioning, CPU scheduling, datastore allocation, and hardware RAID array operations.",
+      logs: [
+        "[ESXi::Host] Hypervisor kernel vSphere 8.0 running healthy.",
+        "[RAID::Controller] Array Status: RAID-10 Optimal, 0 degraded drives.",
+        "[VM::Provision] Snapshot snapshot_nightly_backup completed successfully."
+      ]
+    },
+    {
+      id: "ch-cicd",
+      title: "Automated CI/CD Pipeline & 20% Fast-Track Deployment",
+      category: "DevOps & Automation",
+      sla: "20% Faster Releases",
+      metrics: { latency: "42s build", throughput: "100% Pass", state: "ACTIVE", region: "Automated Deployments" },
+      videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-graphs-and-data-31913-large.mp4",
+      posterBg: "from-amber-950 via-slate-900 to-orange-950",
+      description: "Standardized continuous integration and deployment pipelines automating code compilation, Docker image scans, and zero-downtime Plesk push.",
+      logs: [
+        "[CI::Runner] Webhook triggered from GitHub repository master branch.",
+        "[CD::Plesk] Static assets synced with atomic zero-downtime switch.",
+        "[Perf::Audit] Deployment cycle completed in 42s (20% acceleration)."
+      ]
+    },
+    {
+      id: "ch-security",
+      title: "Zero-Trust Fortinet Cybersecurity & Network Hardening",
+      category: "Cybersecurity & IAM",
+      sla: "Fortinet Hardened",
+      metrics: { latency: "1.2ms inspect", throughput: "10 Gbps", state: "PROTECTED", region: "Zero-Trust Mesh" },
+      videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-futuristic-technology-digital-interface-31912-large.mp4",
+      posterBg: "from-purple-950 via-slate-900 to-pink-950",
+      description: "Active perimeter defense, deep packet inspection, TLS 1.3 encryption tunneling, and credential rotation certified by Fortinet Associate standards.",
+      logs: [
+        "[Fortinet::FW] Policy 104 enforced: 0 unauthorized ingress attempts.",
+        "[VPN::Tunnel] IPSec secure tunnel established with 256-bit AES.",
+        "[IAM::Security] Zero-Trust access token renewed with MFA validation."
+      ]
+    },
+    {
+      id: "ch-ai",
+      title: "Women Safety Analytics & Threat AI Telemetry",
+      category: "AI & Data Innovation",
+      sla: "SIH Award Winner",
+      metrics: { latency: "24ms infer", throughput: "Real-Time", state: "STREAMING", region: "Edge Analytics" },
+      videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-graphs-and-data-31913-large.mp4",
+      posterBg: "from-cyan-950 via-slate-900 to-blue-950",
+      description: "Machine learning anomaly detection platform processing live behavioral threat signals and generating emergency telemetry alerts.",
+      logs: [
+        "[ML::Model] Scikit-learn anomaly classifier loaded in inference memory.",
+        "[Telemetry::Feed] Anomaly threshold evaluated: Normal telemetry stream.",
+        "[Award::SIH] Smart India Hackathon & Hackwith Uttarakhand recognized."
+      ]
+    }
+  ];
+
+  // Auto-advancing slider with progress ticker
+  useEffect(() => {
+    if (!isPlaying) return;
+    const duration = speed === '1x' ? 8000 : 4000;
+    const intervalTime = 50;
+    const step = (intervalTime / duration) * 100;
+
+    const timer = setInterval(() => {
+      setSlideProgress((prev) => {
+        if (prev >= 100) {
+          setActiveChannel((ch) => (ch + 1) % channels.length);
+          return 0;
+        }
+        return prev + step;
+      });
+    }, intervalTime);
+
+    return () => clearInterval(timer);
+  }, [isPlaying, speed, activeChannel, channels.length]);
+
+  const handleNext = () => {
+    setSlideProgress(0);
+    setActiveChannel((prev) => (prev + 1) % channels.length);
+  };
+
+  const handlePrev = () => {
+    setSlideProgress(0);
+    setActiveChannel((prev) => (prev - 1 + channels.length) % channels.length);
+  };
+
+  const curr = channels[activeChannel];
+
+  return (
+    <section id="live-ops" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10 overflow-hidden" data-cursor="slide">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Section Heading */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono mb-3">
+            <Video className="w-3.5 h-3.5 animate-pulse text-cyan-400" />
+            <span>LIVE CLOUD VIDEO & ARCHITECTURE SLIDE SHOWCASE</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Cloud Operations Command Center
+          </h2>
+          <p className="text-slate-400 max-w-2xl mx-auto mt-3 text-sm sm:text-base">
+            Switch between live infrastructure video channels, telemetry streams, and architectural topologies.
+          </p>
+        </motion.div>
+
+        {/* Channel Navigation Slide Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none justify-start lg:justify-center">
+          {channels.map((ch, idx) => (
+            <button
+              key={ch.id}
+              onClick={() => {
+                setActiveChannel(idx);
+                setSlideProgress(0);
+              }}
+              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-xs font-mono whitespace-nowrap transition-all duration-300 border cursor-pointer ${
+                activeChannel === idx
+                  ? 'bg-blue-600 text-white border-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.5)] font-bold scale-105'
+                  : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${activeChannel === idx ? 'bg-white animate-ping' : 'bg-slate-600'}`} />
+              <span>CH {idx + 1}: {ch.category}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Main Video & Slide Showcase Player */}
+        <motion.div 
+          key={activeChannel}
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+          className="rounded-3xl bg-gradient-to-b from-[#0e1424] via-[#090d16] to-[#0a0f1d] border border-blue-900/50 shadow-[0_0_50px_rgba(14,20,36,0.8)] overflow-hidden"
+        >
+          {/* Player Header HUD */}
+          <div className="px-6 py-4 bg-[#0d121f]/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="flex h-3 w-3 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              </span>
+              <div>
+                <span className="text-xs font-mono font-bold text-white flex items-center gap-2">
+                  <span>CHANNEL 0{activeChannel + 1} // {curr.category.toUpperCase()}</span>
+                </span>
+                <p className="text-[11px] text-slate-400 font-mono">{curr.title}</p>
+              </div>
+            </div>
+
+            {/* Slide & Video Playback Controls */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePrev}
+                className="p-2 rounded-xl bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 transition-all hover:scale-105 cursor-pointer"
+                title="Previous Slide"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold transition-all shadow-md cursor-pointer"
+              >
+                {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                <span>{isPlaying ? 'AUTO-SLIDE' : 'PAUSED'}</span>
+              </button>
+
+              <button
+                onClick={handleNext}
+                className="p-2 rounded-xl bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 transition-all hover:scale-105 cursor-pointer"
+                title="Next Slide"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setSpeed(speed === '1x' ? '2x' : '1x')}
+                className="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-mono text-cyan-400 hover:border-cyan-500/40 cursor-pointer"
+              >
+                {speed} SPEED
+              </button>
+            </div>
+          </div>
+
+          {/* Progress Bar for Auto-Slide */}
+          <div className="w-full h-1 bg-slate-800">
+            <div 
+              className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 transition-all duration-75"
+              style={{ width: `${slideProgress}%` }}
+            />
+          </div>
+
+          {/* Video & Telemetry Display Body */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
+            
+            {/* Left Main Stream Window */}
+            <div className="lg:col-span-8 p-6 sm:p-8 flex flex-col justify-between relative min-h-[380px] bg-black/40" data-cursor="video">
+              
+              {/* Active Video Loop Layer */}
+              <div className="absolute inset-0 overflow-hidden opacity-35 mix-blend-screen pointer-events-none">
+                <video
+                  key={curr.videoSrc}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                >
+                  <source src={curr.videoSrc} type="video/mp4" />
+                </video>
+              </div>
+
+              {/* Watermark HUD */}
+              <div className="relative z-10 flex items-center justify-between">
+                <span className="px-3 py-1 rounded-lg bg-red-600/90 text-white text-[10px] font-mono font-bold tracking-wider flex items-center gap-1.5 shadow-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  REC // LIVE
+                </span>
+                <span className="text-xs font-mono text-cyan-300 bg-slate-950/80 px-3 py-1 rounded-lg border border-slate-800">
+                  {curr.sla}
+                </span>
+              </div>
+
+              {/* Main Overlay Description & Metrics */}
+              <div className="relative z-10 mt-16 sm:mt-24">
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 tracking-tight">
+                  {curr.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed mb-6">
+                  {curr.description}
+                </p>
+
+                {/* Real-time Telemetry Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
+                    <div className="text-[10px] font-mono text-slate-500">LATENCY</div>
+                    <div className="text-sm font-bold text-emerald-400 font-mono mt-0.5">{curr.metrics.latency}</div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
+                    <div className="text-[10px] font-mono text-slate-500">BANDWIDTH</div>
+                    <div className="text-sm font-bold text-cyan-400 font-mono mt-0.5">{curr.metrics.throughput}</div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
+                    <div className="text-[10px] font-mono text-slate-500">CLUSTER STATE</div>
+                    <div className="text-sm font-bold text-blue-400 font-mono mt-0.5">{curr.metrics.state}</div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
+                    <div className="text-[10px] font-mono text-slate-500">REGION MESH</div>
+                    <div className="text-xs font-bold text-slate-200 font-mono mt-0.5 truncate">{curr.metrics.region}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Synchronized Infrastructure Telemetry Console */}
+            <div className="lg:col-span-4 p-6 sm:p-8 bg-[#090d18] border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col justify-between font-mono text-xs">
+              <div>
+                <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+                  <span className="text-slate-400 font-semibold flex items-center gap-2">
+                    <TerminalIcon className="w-4 h-4 text-cyan-400" />
+                    LIVE OPS LOGS
+                  </span>
+                  <span className="text-[10px] text-emerald-400 animate-pulse font-bold">STREAM ACTIVE</span>
+                </div>
+
+                <div className="space-y-3">
+                  {curr.logs.map((log, lIdx) => (
+                    <div key={lIdx} className="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 text-slate-300 text-[11px] leading-relaxed">
+                      <span className="text-cyan-400 mr-2">❯</span>
+                      {log}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Slide Navigation Indicator Pills */}
+              <div className="pt-6 mt-6 border-t border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  {channels.map((_, dotIdx) => (
+                    <button
+                      key={dotIdx}
+                      onClick={() => {
+                        setActiveChannel(dotIdx);
+                        setSlideProgress(0);
+                      }}
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                        activeChannel === dotIdx ? 'w-6 bg-blue-500 shadow-md shadow-blue-500/50' : 'w-2 bg-slate-700 hover:bg-slate-500'
+                      }`}
+                      aria-label={`Jump to slide ${dotIdx + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <span className="text-slate-500 text-[11px]">
+                  Slide 0{activeChannel + 1} / 0{channels.length}
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </motion.div>
+
+      </div>
+    </section>
+  );
+}
+
+// ----------------------------------------------------
 // Interactive Linux / Cloud Terminal Emulator
 // ----------------------------------------------------
 function InteractiveTerminal() {
@@ -851,7 +1321,7 @@ function InteractiveTerminal() {
   const quickCommands = ['help', 'whoami', 'skills', 'infra', 'experience', 'certs', 'contact'];
 
   return (
-    <section id="terminal" className="py-20 bg-[#07090e]/90 relative z-10">
+    <section id="terminal" className="py-20 bg-[#07090e]/90 relative z-10" data-cursor="terminal">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -1605,72 +2075,176 @@ function DatacenterSection() {
 }
 
 // ----------------------------------------------------
-// Projects & Innovation Section
+// Projects & Case Studies Interactive Slide Carousel
 // ----------------------------------------------------
 function ProjectsSection() {
+  const [projectSlide, setProjectSlide] = useState(0);
+
+  const projects = [
+    {
+      title: "Women Safety Analytics — AI & Threat Detection Platform",
+      tagline: "Smart India Hackathon (SIH) & Hackwith Uttarakhand Award Winner",
+      category: "AI & Threat Analytics",
+      badgeColor: "border-blue-500/40 bg-blue-500/10 text-blue-400",
+      description: "Engineered a real-time safety telemetry and anomaly detection platform using Python and Scikit-learn to detect irregular danger signals in public areas. Successfully deployed in 5+ field prototypes with Madadgar Foundation.",
+      tech: ["Python", "Machine Learning", "Pandas", "Scikit-learn", "Anomaly Detection", "FastAPI"],
+      highlights: [
+        "Smart India Hackathon (SIH) Award Winner for technical architecture.",
+        "Hackwith Uttarakhand Innovation Award for practical societal impact.",
+        "5+ functional software prototypes deployed with Madadgar Foundation."
+      ],
+      metrics: "96.4% Detection Accuracy • Real-Time Alert Dispatch"
+    },
+    {
+      title: "Enterprise Multi-Cloud Infrastructure & Automated CI/CD",
+      tagline: "Purvaco Technology Pvt. Ltd. — 99.9% Production SLA",
+      category: "Cloud & DevOps Architecture",
+      badgeColor: "border-emerald-500/40 bg-emerald-500/10 text-emerald-400",
+      description: "Architected multi-cloud hosting environment on AWS (EC2, S3, RDS, VPC) and Google Cloud Platform with automated CI/CD deployment pipelines, cutting application rollout turnaround times by 20%.",
+      tech: ["AWS", "GCP", "CI/CD Pipelines", "Ubuntu Linux", "Plesk", "Docker"],
+      highlights: [
+        "99.9% SLA sustained across client-facing production workloads.",
+        "20% reduction in deployment turnaround time via pipeline automation.",
+        "Multi-cloud disaster recovery and automated snapshot management."
+      ],
+      metrics: "99.9% Uptime SLA • 20% Release Velocity Boost"
+    },
+    {
+      title: "Datacenter Virtualization & Hypervisor Optimization",
+      tagline: "VMware ESXi Cluster & Bare-Metal Hardware Administration",
+      category: "Datacenter & Hypervisors",
+      badgeColor: "border-purple-500/40 bg-purple-500/10 text-purple-400",
+      description: "Administering enterprise VMware ESXi virtualization cluster, hardware RAID disk arrays, rack installations, network cabling, and least-privilege zero-trust firewall configurations.",
+      tech: ["VMware ESXi", "RAID Storage", "Windows Server", "Firewall Rules", "VPN Tunneling"],
+      highlights: [
+        "Zero data loss with scheduled snapshot backups and RAID fault tolerance.",
+        "Full bare-metal lifecycle management from unboxing to hypervisor provisioning.",
+        "Hardened firewall policies and secure VPN remote access tunnels."
+      ],
+      metrics: "0 Data Loss • Multi-Tier RAID Redundancy"
+    }
+  ];
+
+  const nextSlide = () => setProjectSlide((prev) => (prev + 1) % projects.length);
+  const prevSlide = () => setProjectSlide((prev) => (prev - 1 + projects.length) % projects.length);
+
+  const activeProject = projects[projectSlide];
+
   return (
-    <section id="projects" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10">
+    <section id="projects" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10" data-cursor="slide">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-mono mb-3">
             <Award className="w-3.5 h-3.5" />
-            <span>PROVEN DELIVERABLES</span>
+            <span>INTERACTIVE PROJECT SLIDER</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Key Projects & Innovation
+            Featured Projects & Engineering Case Studies
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto mt-3 text-sm sm:text-base">
-            Applying engineering and AI to solve real-world security and data monitoring challenges.
+            Slide through real-world cloud migrations, AI applications, and virtualization deployments.
           </p>
         </motion.div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 25 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.5 }}
-          className="max-w-4xl mx-auto p-8 sm:p-10 rounded-3xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_35px_rgba(59,130,246,0.18)] hover:-translate-y-1.5 transition-all duration-300 shadow-2xl"
-        >
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="px-3 py-1 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-mono">Python</span>
-            <span className="px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono">Machine Learning</span>
-            <span className="px-3 py-1 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-mono">Pandas & Scikit-learn</span>
-            <span className="px-3 py-1 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-mono">Anomaly Detection</span>
+        {/* Slider Controls Bar */}
+        <div className="flex items-center justify-between max-w-4xl mx-auto mb-6">
+          <div className="flex items-center gap-2">
+            {projects.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setProjectSlide(idx)}
+                className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  projectSlide === idx ? 'w-8 bg-blue-500 shadow-md shadow-blue-500/50' : 'w-2.5 bg-slate-800 hover:bg-slate-600'
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
           </div>
 
-          <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">Women Safety Analytics</h3>
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
-            Engineered an AI-powered analytics solution for threat detection and public safety monitoring using anomaly detection and gender-based classification models. Applied machine learning algorithms to identify irregular threat signals and provide actionable telemetry.
-          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={prevSlide}
+              className="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 transition-all hover:scale-105 cursor-pointer shadow-md"
+              aria-label="Previous project"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="p-2.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white border border-slate-800 transition-all hover:scale-105 cursor-pointer shadow-md"
+              aria-label="Next project"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 transition-colors">
-              <div className="text-xs font-mono text-amber-400 font-bold mb-1 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
-                Smart India Hackathon (SIH)
-              </div>
-              <div className="text-xs text-slate-400">Awarded for innovative AI solution architecture and real-time threat analysis.</div>
+        {/* Slide Card Content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={projectSlide}
+            initial={{ opacity: 0, x: 25 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -25 }}
+            transition={{ duration: 0.35 }}
+            className="max-w-4xl mx-auto p-8 sm:p-12 rounded-3xl bg-slate-900/70 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900 hover:shadow-[0_0_40px_rgba(59,130,246,0.2)] transition-all duration-300 shadow-2xl relative overflow-hidden"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+              <span className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-semibold border ${activeProject.badgeColor}`}>
+                {activeProject.category}
+              </span>
+              <span className="text-xs font-mono text-slate-500">
+                Project 0{projectSlide + 1} / 0{projects.length}
+              </span>
             </div>
-            <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 transition-colors">
-              <div className="text-xs font-mono text-blue-400 font-bold mb-1 flex items-center gap-1.5">
-                <Award className="w-3.5 h-3.5" />
-                Madadgar Foundation
-              </div>
-              <div className="text-xs text-slate-400">Delivered 5+ working social-impact prototypes applying technology to safety.</div>
-            </div>
-          </div>
 
-          <div className="p-4 rounded-2xl bg-blue-950/30 border border-blue-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <span className="text-xs text-blue-300 font-medium">Winner: Hackwith Uttarakhand & SIH Awardee</span>
-            <span className="text-xs font-mono text-blue-400 bg-blue-900/40 px-3 py-1 rounded-lg border border-blue-800/60">Production Tested Prototype</span>
-          </div>
-        </motion.div>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 leading-snug">
+              {activeProject.title}
+            </h3>
+            <p className="text-xs sm:text-sm font-mono text-blue-400 mb-6">
+              {activeProject.tagline}
+            </p>
+
+            <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-8">
+              {activeProject.description}
+            </p>
+
+            {/* Key Deliverables */}
+            <div className="mb-8 space-y-2.5">
+              <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold mb-2">Key Outcomes:</div>
+              {activeProject.highlights.map((h, hIdx) => (
+                <div key={hIdx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-200">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span>{h}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Tech Stack Pills */}
+            <div className="pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap gap-2">
+                {activeProject.tech.map((t, tIdx) => (
+                  <span key={tIdx} className="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700/60">
+                    {t}
+                  </span>
+                ))}
+              </div>
+
+              <span className="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-lg border border-emerald-800/60">
+                {activeProject.metrics}
+              </span>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
       </div>
     </section>
   );
