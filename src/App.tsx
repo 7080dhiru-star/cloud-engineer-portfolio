@@ -7,7 +7,7 @@ import {
   Layers, HardDrive, CheckCircle2, Lock, Zap, Clock,
   TrendingUp, Award, RefreshCw, Eye, ArrowUp, Check,
   Play, Pause, EyeOff, Radio, Sliders, ChevronLeft, ChevronRight,
-  Video
+  Video, Database, Globe
 } from 'lucide-react';
 import profilePhoto from './assets/Abhishek_Singh_JPG.jpg';
 
@@ -41,7 +41,6 @@ function AstraCursor() {
   const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
-    // Detect touch / coarse devices
     if (window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window) {
       setIsTouch(true);
       return;
@@ -90,13 +89,10 @@ function AstraCursor() {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden select-none">
-      {/* Precision Micro Dot */}
       <div
         className="fixed w-1.5 h-1.5 rounded-full bg-blue-300 shadow-[0_0_8px_#60a5fa] -translate-x-1/2 -translate-y-1/2 transition-transform duration-75"
         style={{ left: `${mousePos.x}px`, top: `${mousePos.y}px` }}
       />
-
-      {/* Soft Ambient Astra Glow Halo */}
       <div
         className={`fixed rounded-full -translate-x-1/2 -translate-y-1/2 transition-all duration-300 pointer-events-none ${
           isHovering
@@ -175,11 +171,8 @@ function AstraCard({
       onClick={onClick}
       className={`astra-glow-container relative rounded-3xl bg-slate-900/60 border border-slate-800/90 shadow-xl overflow-hidden ${className}`}
     >
-      {/* Astra Dynamic Radial Spotlight Layer */}
       <div className="astra-glow-overlay" />
-      {/* Astra Interactive Border Highlight */}
       <div className="astra-border-highlight" />
-      {/* Card Content with proper z-index */}
       <div className="relative z-10 w-full h-full flex flex-col justify-between">
         {children}
       </div>
@@ -201,7 +194,6 @@ function CloudServicesBackground({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [videoError, setVideoError] = useState(false);
 
-  // Handle Play/Pause
   useEffect(() => {
     if (videoRef.current) {
       if (isVideoPlaying) {
@@ -212,7 +204,6 @@ function CloudServicesBackground({
     }
   }, [isVideoPlaying]);
 
-  // Interactive 3D Cyber Server Rack & Cloud Mesh Engine
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -230,7 +221,6 @@ function CloudServicesBackground({
     };
     window.addEventListener('resize', handleResize);
 
-    // Mouse tracking
     let mouse = { x: width / 2, y: height / 2, active: false };
     const handleMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
@@ -239,7 +229,6 @@ function CloudServicesBackground({
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Cloud Data Nodes
     const nodeLabels = ['AWS::VPC', 'GCP::AlloyDB', 'VMware::ESXi', 'K8s::Cluster', 'Ubuntu::Prod', 'CI/CD::Runner', 'AWS::RDS', 'Cloudflare::DNS', 'Fortinet::IAM'];
     const nodes: Array<{
       x: number;
@@ -273,12 +262,10 @@ function CloudServicesBackground({
       frame++;
       ctx.clearRect(0, 0, width, height);
 
-      // Draw subtle cyber perspective grid on the floor
       const horizonY = height * 0.45;
       ctx.strokeStyle = 'rgba(30, 58, 138, 0.12)';
       ctx.lineWidth = 1;
 
-      // Perspective lines converging to center horizon
       const vanishX = width * 0.5 + (mouse.x - width / 2) * 0.05;
       for (let x = -width * 0.5; x <= width * 1.5; x += width * 0.1) {
         ctx.beginPath();
@@ -287,7 +274,6 @@ function CloudServicesBackground({
         ctx.stroke();
       }
 
-      // Horizontal floor grid lines moving forward
       const gridOffset = (frame * 0.4) % 40;
       for (let y = horizonY + gridOffset; y < height; y += 40) {
         const factor = (y - horizonY) / (height - horizonY);
@@ -298,7 +284,6 @@ function CloudServicesBackground({
         ctx.stroke();
       }
 
-      // Draw Interconnected Cloud Nodes & Pulses
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         n.x += n.vx;
@@ -373,7 +358,6 @@ function CloudServicesBackground({
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
-      {/* 1. Real-time Background Cloud Video Stream Layer */}
       {showVideoOverlay && !videoError && (
         <div className="absolute inset-0 z-0">
           <video
@@ -392,18 +376,211 @@ function CloudServicesBackground({
         </div>
       )}
 
-      {/* 2. Interactive 3D Cyber Infrastructure Canvas Engine */}
       <canvas 
         ref={canvasRef} 
         className="absolute inset-0 w-full h-full opacity-65 z-[1]"
       />
 
-      {/* 3. Deep Cyber Vignette & Contrast Protection Layer */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#07090e]/85 via-[#07090e]/75 to-[#07090e] z-[2]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_30%,transparent_20%,#07090e_90%)] z-[2]" />
-
-      {/* 4. Fine Digital Scanline Texture */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-25 z-[3]" />
+    </div>
+  );
+}
+
+// ----------------------------------------------------
+// Animated SVG Cloud Architecture Diagram
+// ----------------------------------------------------
+function CloudTopologyDiagram({ type }: { type: string }) {
+  if (type === 'ch-aws') {
+    return (
+      <div className="p-4 rounded-2xl bg-slate-950/80 border border-blue-900/40 relative overflow-hidden flex flex-col gap-3">
+        <div className="flex items-center justify-between text-[11px] font-mono text-blue-400 border-b border-slate-800 pb-2">
+          <span className="flex items-center gap-1.5 font-bold">
+            <Cloud className="w-3.5 h-3.5" /> AWS VPC Architecture Flow
+          </span>
+          <span className="text-emerald-400 font-bold">● Multi-AZ Active</span>
+        </div>
+        
+        {/* Animated Vector Topology */}
+        <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-mono py-2 relative">
+          <div className="p-2.5 rounded-xl bg-blue-950/50 border border-blue-800/60 flex flex-col items-center">
+            <Globe className="w-4 h-4 text-cyan-400 mb-1 animate-pulse" />
+            <span className="text-white font-semibold">Route53</span>
+            <span className="text-slate-500 text-[9px]">DNS Gateway</span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-blue-950/50 border border-blue-800/60 flex flex-col items-center">
+            <Shield className="w-4 h-4 text-indigo-400 mb-1" />
+            <span className="text-white font-semibold">VPC & IAM</span>
+            <span className="text-slate-500 text-[9px]">Security Group</span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-blue-950/50 border border-blue-800/60 flex flex-col items-center">
+            <Cpu className="w-4 h-4 text-blue-400 mb-1 animate-bounce" />
+            <span className="text-white font-semibold">EC2 AutoScale</span>
+            <span className="text-slate-500 text-[9px]">App Cluster</span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-blue-950/50 border border-blue-800/60 flex flex-col items-center">
+            <Database className="w-4 h-4 text-emerald-400 mb-1" />
+            <span className="text-white font-semibold">RDS Multi-AZ</span>
+            <span className="text-slate-500 text-[9px]">PostgreSQL</span>
+          </div>
+        </div>
+
+        {/* Live Status Bar */}
+        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-800">
+          <span>Throughput: <strong className="text-white">1.4 GB/s</strong></span>
+          <span>Health: <strong className="text-emerald-400">100% Passed</strong></span>
+          <span>Failover: <strong className="text-blue-400">Automated</strong></span>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === 'ch-vmware') {
+    return (
+      <div className="p-4 rounded-2xl bg-slate-950/80 border border-emerald-900/40 relative overflow-hidden flex flex-col gap-3">
+        <div className="flex items-center justify-between text-[11px] font-mono text-emerald-400 border-b border-slate-800 pb-2">
+          <span className="flex items-center gap-1.5 font-bold">
+            <Server className="w-3.5 h-3.5" /> VMware ESXi 8.x Hypervisor Topology
+          </span>
+          <span className="text-emerald-400 font-bold">● Bare-Metal OK</span>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-mono py-2">
+          <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-800/50 flex flex-col items-center">
+            <Server className="w-4 h-4 text-emerald-400 mb-1" />
+            <span className="text-white font-semibold">ESXi Host</span>
+            <span className="text-slate-500 text-[9px]">vSphere vCenter</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-800/50 flex flex-col items-center">
+            <Cpu className="w-4 h-4 text-cyan-400 mb-1" />
+            <span className="text-white font-semibold">VM Instances</span>
+            <span className="text-slate-500 text-[9px]">Ubuntu/Windows</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-800/50 flex flex-col items-center">
+            <HardDrive className="w-4 h-4 text-amber-400 mb-1" />
+            <span className="text-white font-semibold">RAID-10 NVMe</span>
+            <span className="text-slate-500 text-[9px]">Hardware Arrays</span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-800">
+          <span>Hypervisor CPU: <strong className="text-emerald-400">18.4%</strong></span>
+          <span>Datastore: <strong className="text-cyan-400">RAID-10 Optimal</strong></span>
+          <span>DR Snapshots: <strong className="text-white">Active</strong></span>
+        </div>
+      </div>
+    );
+  }
+
+  // Default CI/CD or Security diagram
+  return (
+    <div className="p-4 rounded-2xl bg-slate-950/80 border border-indigo-900/40 relative overflow-hidden flex flex-col gap-3">
+      <div className="flex items-center justify-between text-[11px] font-mono text-indigo-400 border-b border-slate-800 pb-2">
+        <span className="flex items-center gap-1.5 font-bold">
+          <RefreshCw className="w-3.5 h-3.5 animate-spin" /> CI/CD Automated Pipeline Stream
+        </span>
+        <span className="text-amber-400 font-bold">● 20% Fast-Track</span>
+      </div>
+
+      <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-mono py-2">
+        <div className="p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-800/50 flex flex-col items-center">
+          <TerminalIcon className="w-4 h-4 text-blue-400 mb-1" />
+          <span className="text-white font-semibold">Git Push</span>
+          <span className="text-slate-500 text-[9px]">Master Branch</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-800/50 flex flex-col items-center">
+          <Zap className="w-4 h-4 text-amber-400 mb-1" />
+          <span className="text-white font-semibold">Docker Build</span>
+          <span className="text-slate-500 text-[9px]">Image Layering</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-800/50 flex flex-col items-center">
+          <Shield className="w-4 h-4 text-emerald-400 mb-1" />
+          <span className="text-white font-semibold">Test & Audit</span>
+          <span className="text-slate-500 text-[9px]">Zero Vulnerability</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-800/50 flex flex-col items-center">
+          <Cloud className="w-4 h-4 text-cyan-400 mb-1" />
+          <span className="text-white font-semibold">Plesk Deploy</span>
+          <span className="text-slate-500 text-[9px]">Zero-Downtime</span>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-800">
+        <span>Build Time: <strong className="text-emerald-400">42 seconds</strong></span>
+        <span>Acceleration: <strong className="text-amber-400">+20% Faster</strong></span>
+        <span>Status: <strong className="text-white">Automated</strong></span>
+      </div>
+    </div>
+  );
+}
+
+// ----------------------------------------------------
+// Animated Datacenter Server Rack Visualizer
+// ----------------------------------------------------
+function AnimatedDatacenterRack() {
+  const [pulse, setPulse] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setPulse((p) => (p + 1) % 100), 500);
+    return () => clearInterval(timer);
+  }, []);
+
+  const servers = [
+    { name: "Node 01: Multi-Cloud Gateway (AWS/GCP)", cpu: "24%", ram: "38%", status: "OPTIMAL", led: "bg-emerald-400" },
+    { name: "Node 02: VMware ESXi 8.x Hypervisor Cluster", cpu: "32%", ram: "64%", status: "HEALTHY", led: "bg-emerald-400" },
+    { name: "Node 03: High-Availability Database Node", cpu: "41%", ram: "52%", status: "SYNCED", led: "bg-cyan-400" },
+    { name: "Node 04: AI Telemetry & SIH Anomaly Engine", cpu: "18%", ram: "29%", status: "INFERENCE", led: "bg-blue-400" }
+  ];
+
+  return (
+    <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 font-mono text-xs text-slate-300 space-y-4 shadow-2xl">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <span className="text-emerald-400 font-bold flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+          42U ENTERPRISE DATACENTER RACK
+        </span>
+        <span className="text-[11px] text-slate-500">21.4°C • RAID-10 ACTIVE</span>
+      </div>
+
+      {/* Rack Server Blades */}
+      <div className="space-y-2.5">
+        {servers.map((srv, idx) => (
+          <div key={idx} className="p-3 rounded-xl bg-[#090e18] border border-slate-800/90 flex flex-col gap-2 hover:border-blue-500/50 transition-colors">
+            <div className="flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-2">
+                <span className={`w-2 h-2 rounded-full ${srv.led} ${pulse % 2 === 0 ? 'opacity-100' : 'opacity-60'}`} />
+                <span className="font-semibold text-white">{srv.name}</span>
+              </div>
+              <span className="text-[10px] text-emerald-400 font-bold">{srv.status}</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-400 pt-1">
+              <div>
+                CPU: <strong className="text-slate-200">{srv.cpu}</strong>
+                <div className="w-full bg-slate-800 h-1 rounded-full mt-1 overflow-hidden">
+                  <div className="bg-blue-500 h-full rounded-full" style={{ width: srv.cpu }} />
+                </div>
+              </div>
+              <div>
+                RAM: <strong className="text-slate-200">{srv.ram}</strong>
+                <div className="w-full bg-slate-800 h-1 rounded-full mt-1 overflow-hidden">
+                  <div className="bg-emerald-500 h-full rounded-full" style={{ width: srv.ram }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-500">
+        <span>SLA: <strong className="text-emerald-400">99.9% Production</strong></span>
+        <span>Storage: <strong className="text-white">RAID-10 NVMe</strong></span>
+        <span>Backup: <strong className="text-cyan-400">Scheduled</strong></span>
+      </div>
     </div>
   );
 }
@@ -435,16 +612,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 font-sans selection:bg-blue-500/30 selection:text-blue-300 relative overflow-x-hidden">
-      {/* OpenAI Astra Fluid Mouse Cursor */}
       <AstraCursor />
 
-      {/* Top Scroll Progress Bar */}
       <div 
         className="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-blue-500 via-cyan-400 to-indigo-500 z-[100] transition-all duration-150"
         style={{ width: `${scrollProgress}%` }}
       />
 
-      {/* Pro Cloud Services Video & Cyber Infrastructure Background */}
       <CloudServicesBackground 
         isVideoPlaying={isVideoPlaying} 
         showVideoOverlay={showVideoOverlay}
@@ -476,7 +650,6 @@ export default function App() {
 
       <Footer />
 
-      {/* Floating Back to Top Button */}
       <AnimatePresence>
         {showBackToTop && (
           <motion.button
@@ -492,7 +665,6 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Certificate Lightbox Modal */}
       <AnimatePresence>
         {selectedCert && (
           <CertificateModal cert={selectedCert} onClose={() => setSelectedCert(null)} />
@@ -558,7 +730,6 @@ function Header() {
           </div>
         </a>
 
-        {/* Desktop Navigation with Astra Pill Hover */}
         <nav className="hidden lg:flex items-center gap-1 bg-slate-900/70 p-1.5 rounded-full border border-slate-800/80 backdrop-blur-md shadow-inner">
           {navItems.map((item) => (
             <a
@@ -575,7 +746,6 @@ function Header() {
           ))}
         </nav>
 
-        {/* Action CTAs */}
         <div className="hidden md:flex items-center gap-3">
           <a
             href={getAssetUrl('Abhishek_Singh_ATS_Resume.pdf')}
@@ -606,7 +776,6 @@ function Header() {
           </a>
         </div>
 
-        {/* Mobile Hamburger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="lg:hidden p-2.5 rounded-xl bg-slate-900 text-slate-300 border border-slate-800 hover:text-white transition-colors cursor-pointer"
@@ -616,7 +785,6 @@ function Header() {
         </button>
       </div>
 
-      {/* Mobile Drawer */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -657,7 +825,7 @@ function Header() {
 }
 
 // ----------------------------------------------------
-// Hero Section with Cloud Video HUD Telemetry
+// Hero Section with Orbiting Badges & Telemetry
 // ----------------------------------------------------
 function Hero({
   isVideoPlaying,
@@ -706,7 +874,6 @@ function Hero({
               <span>SLA: 99.9%</span>
             </div>
 
-            {/* Video Controls Toggle */}
             <div className="flex items-center gap-1 ml-auto bg-slate-900/80 p-1 rounded-xl border border-slate-800">
               <button
                 onClick={() => setIsVideoPlaying(!isVideoPlaying)}
@@ -735,7 +902,6 @@ function Hero({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-950/70 border border-blue-700/60 text-blue-400 text-xs font-mono font-semibold mb-6 backdrop-blur-md shadow-lg shadow-blue-950/40">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>99.9% PRODUCTION SLA • CLOUD & DEVOPS ENGINEER</span>
@@ -800,7 +966,7 @@ function Hero({
             </motion.div>
           </div>
 
-          {/* Right Hero Visual & Profile Image */}
+          {/* Right Hero Visual & Profile Image with Orbiting Badges */}
           <div className="lg:col-span-5 flex justify-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -832,6 +998,7 @@ function Hero({
                   <div className="absolute inset-0 bg-gradient-to-t from-[#07090e]/80 via-transparent to-transparent pointer-events-none" />
                 </div>
 
+                {/* Orbiting Badges with Live Animations */}
                 <motion.div 
                   animate={{ y: [0, -8, 0] }}
                   transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
@@ -925,7 +1092,7 @@ function CloudOpsLiveCenter() {
     {
       id: "ch-aws",
       title: "AWS Multi-Region VPC & RDS Failover Topology",
-      category: "Multi-Cloud Architecture",
+      category: "AWS Cloud Architecture",
       sla: "99.9% Production SLA",
       metrics: { latency: "14ms", throughput: "1.4 GB/s", state: "HEALTHY", region: "us-east-1 & ap-south-1" },
       videoSrc: "https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-graphs-and-data-31913-large.mp4",
@@ -999,7 +1166,6 @@ function CloudOpsLiveCenter() {
     }
   ];
 
-  // Auto-advancing slider with progress ticker
   useEffect(() => {
     if (!isPlaying) return;
     const duration = speed === '1x' ? 8000 : 4000;
@@ -1035,7 +1201,6 @@ function CloudOpsLiveCenter() {
     <section id="live-ops" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Heading */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1078,7 +1243,6 @@ function CloudOpsLiveCenter() {
 
         {/* Main Video & Slide Showcase Player */}
         <AstraCard className="rounded-3xl bg-gradient-to-b from-[#0e1424] via-[#090d16] to-[#0a0f1d] border-blue-900/50 shadow-[0_0_50px_rgba(14,20,36,0.8)]">
-          {/* Player Header HUD */}
           <div className="px-6 py-4 bg-[#0d121f]/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="flex h-3 w-3 relative">
@@ -1093,7 +1257,6 @@ function CloudOpsLiveCenter() {
               </div>
             </div>
 
-            {/* Slide & Video Playback Controls */}
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePrev}
@@ -1128,7 +1291,6 @@ function CloudOpsLiveCenter() {
             </div>
           </div>
 
-          {/* Progress Bar for Auto-Slide */}
           <div className="w-full h-1 bg-slate-800">
             <div 
               className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 transition-all duration-75"
@@ -1139,10 +1301,7 @@ function CloudOpsLiveCenter() {
           {/* Video & Telemetry Display Body */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
             
-            {/* Left Main Stream Window */}
-            <div className="lg:col-span-8 p-6 sm:p-8 flex flex-col justify-between relative min-h-[380px] bg-black/40">
-              
-              {/* Active Video Loop Layer */}
+            <div className="lg:col-span-8 p-6 sm:p-8 flex flex-col justify-between relative min-h-[400px] bg-black/40">
               <div className="absolute inset-0 overflow-hidden opacity-35 mix-blend-screen pointer-events-none">
                 <video
                   key={curr.videoSrc}
@@ -1156,8 +1315,7 @@ function CloudOpsLiveCenter() {
                 </video>
               </div>
 
-              {/* Watermark HUD */}
-              <div className="relative z-10 flex items-center justify-between">
+              <div className="relative z-10 flex items-center justify-between mb-4">
                 <span className="px-3 py-1 rounded-lg bg-red-600/90 text-white text-[10px] font-mono font-bold tracking-wider flex items-center gap-1.5 shadow-md">
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                   REC // LIVE
@@ -1167,16 +1325,19 @@ function CloudOpsLiveCenter() {
                 </span>
               </div>
 
-              {/* Main Overlay Description & Metrics */}
-              <div className="relative z-10 mt-16 sm:mt-24">
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-3 tracking-tight">
+              {/* Real-time Animated Architecture Topology Diagram */}
+              <div className="relative z-10 my-4">
+                <CloudTopologyDiagram type={curr.id} />
+              </div>
+
+              <div className="relative z-10 mt-4">
+                <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-2 tracking-tight">
                   {curr.title}
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed mb-6">
                   {curr.description}
                 </p>
 
-                {/* Real-time Telemetry Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800">
                     <div className="text-[10px] font-mono text-slate-500">LATENCY</div>
@@ -1198,7 +1359,6 @@ function CloudOpsLiveCenter() {
               </div>
             </div>
 
-            {/* Right Synchronized Infrastructure Telemetry Console */}
             <div className="lg:col-span-4 p-6 sm:p-8 bg-[#090d18] border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col justify-between font-mono text-xs">
               <div>
                 <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
@@ -1219,7 +1379,6 @@ function CloudOpsLiveCenter() {
                 </div>
               </div>
 
-              {/* Slide Navigation Indicator Pills */}
               <div className="pt-6 mt-6 border-t border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   {channels.map((_, dotIdx) => (
@@ -1347,7 +1506,6 @@ function InteractiveTerminal() {
           <p className="text-sm text-slate-400 mt-2">Test my background and infrastructure knowledge directly via shell commands.</p>
         </motion.div>
 
-        {/* Quick Command Chips */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
           <span className="text-xs text-slate-500 font-mono">Quick CLI:</span>
           {quickCommands.map((q) => (
@@ -1361,9 +1519,7 @@ function InteractiveTerminal() {
           ))}
         </div>
 
-        {/* Terminal Window with Astra Glow Container */}
         <AstraCard className="rounded-2xl bg-[#090d16]/95 border-slate-800 font-mono text-sm shadow-2xl">
-          {/* Terminal Titlebar */}
           <div className="px-4 py-3 bg-[#0d121f] border-b border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block hover:scale-110 transition-transform cursor-pointer" />
@@ -1377,7 +1533,6 @@ function InteractiveTerminal() {
             </div>
           </div>
 
-          {/* Terminal Body */}
           <div ref={terminalContainerRef} className="p-6 min-h-[260px] max-h-[380px] overflow-y-auto space-y-4">
             <div className="text-slate-500 text-xs">
               Welcome to Abhishek Singh Cloud Terminal v2.4 (x86_64-pc-linux-gnu).<br />
@@ -1399,7 +1554,6 @@ function InteractiveTerminal() {
               </div>
             ))}
 
-            {/* Live Input Line */}
             <div className="flex items-center gap-2 text-slate-300 pt-2">
               <span className="text-emerald-400 font-semibold">abhishek@prod-cloud</span>
               <span className="text-slate-600">:</span>
@@ -1500,7 +1654,6 @@ function ArchitectureVisualizer() {
           </p>
         </motion.div>
 
-        {/* Pipeline Grid with Astra Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pipelineSteps.map((step, idx) => (
             <AstraCard
@@ -1534,7 +1687,6 @@ function ArchitectureVisualizer() {
           ))}
         </div>
 
-        {/* Multi-Cloud & Hypervisor Interconnect Banner */}
         <AstraCard className="mt-12 p-7 bg-gradient-to-r from-blue-950/50 via-slate-900 to-indigo-950/50 border-blue-900/50 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="p-3.5 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30">
@@ -1935,7 +2087,7 @@ function DatacenterSection() {
         <AstraCard className="p-8 sm:p-12 bg-gradient-to-br from-[#0c1220] via-slate-900 to-[#0c1220] border-blue-900/40">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-6">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono mb-4">
                 <Server className="w-3.5 h-3.5" />
                 <span>ON-PREM & VIRTUALIZATION ENGINE</span>
@@ -1975,34 +2127,10 @@ function DatacenterSection() {
               </div>
             </div>
 
-            <div className="lg:col-span-5 flex justify-center">
-              <div className="p-6 rounded-2xl bg-slate-950/90 border border-slate-800 hover:border-emerald-500/40 transition-colors w-full font-mono text-xs text-slate-300 space-y-3 shadow-2xl">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                  <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    ESXi Host Telemetry
-                  </span>
-                  <span className="text-slate-500">vSphere / ESXi 7.x/8.x</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Hypervisor State:</span>
-                  <span className="text-emerald-400 font-semibold">RUNNING (Healthy)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Virtual Machines:</span>
-                  <span className="text-white">Active Provisioned</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Storage Controller:</span>
-                  <span className="text-white">Hardware RAID Configured</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Disaster Recovery:</span>
-                  <span className="text-blue-400">Scheduled Snapshots</span>
-                </div>
-                <div className="pt-2 border-t border-slate-800 text-[10px] text-slate-500 text-center">
-                  Production Virtualization Tested & Verified
-                </div>
+            {/* Right Interactive Animated Server Rack Chassis */}
+            <div className="lg:col-span-6 flex justify-center">
+              <div className="w-full">
+                <AnimatedDatacenterRack />
               </div>
             </div>
 
@@ -2073,7 +2201,6 @@ function ProjectsSection() {
     <section id="projects" className="py-24 bg-[#07090e]/95 border-t border-slate-800/80 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -2093,7 +2220,6 @@ function ProjectsSection() {
           </p>
         </motion.div>
 
-        {/* Slider Controls Bar */}
         <div className="flex items-center justify-between max-w-4xl mx-auto mb-6">
           <div className="flex items-center gap-2">
             {projects.map((_, idx) => (
@@ -2126,7 +2252,6 @@ function ProjectsSection() {
           </div>
         </div>
 
-        {/* Slide Card Content with AstraCard */}
         <AnimatePresence mode="wait">
           <motion.div
             key={projectSlide}
@@ -2156,7 +2281,6 @@ function ProjectsSection() {
                 {activeProject.description}
               </p>
 
-              {/* Key Deliverables */}
               <div className="mb-8 space-y-2.5">
                 <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold mb-2">Key Outcomes:</div>
                 {activeProject.highlights.map((h, hIdx) => (
@@ -2167,7 +2291,6 @@ function ProjectsSection() {
                 ))}
               </div>
 
-              {/* Tech Stack Pills */}
               <div className="pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap gap-2">
                   {activeProject.tech.map((t, tIdx) => (
@@ -2418,7 +2541,6 @@ function ContactSection() {
             Looking for a dedicated Cloud & DevOps Engineer to design resilient infrastructure, automate CI/CD pipelines, or optimize your cloud costs?
           </p>
 
-          {/* Direct Connect Buttons with Rich Hover */}
           <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
             <a
               href="mailto:7080dhiru@gmail.com"
@@ -2449,7 +2571,6 @@ function ContactSection() {
             </a>
           </div>
 
-          {/* Info Badges */}
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400 font-mono">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/50 border border-slate-800">
               <Phone className="w-4 h-4 text-emerald-400" />
@@ -2533,7 +2654,6 @@ function CertificateModal({ cert, onClose }: { cert: { name: string; issuer: str
           </div>
         )}
 
-        {/* Embedded PDF or Verification View */}
         {pdfUrl ? (
           <div className="space-y-4">
             <div className="w-full h-80 sm:h-96 rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center relative shadow-inner">
