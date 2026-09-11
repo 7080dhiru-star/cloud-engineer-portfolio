@@ -523,9 +523,22 @@ function InfrastructureTopologyBackground({
 
     const topologyLabels = [
       'AWS::VPC', 'GCP::AlloyDB', 'VMware::ESXi', 'K8s::Cluster', 
-      'Ubuntu::Prod', 'CI/CD::Runner', 'AWS::RDS', 'ZeroTrust::IAM', 'Fortinet::Edge'
+      'Ubuntu::Prod', 'CI/CD::Runner', 'AWS::RDS', 'ZeroTrust::IAM', 
+      'Fortinet::Edge', 'AI::Telemetry', 'Docker::Swarm', 'FastAPI::Node'
     ];
     
+    // Rich multi-chromatic spectrum colors
+    const colors = [
+      '#00f0ff', // Cyber Cyan
+      '#3b82f6', // Electric Blue
+      '#a855f7', // Vivid Purple
+      '#ec4899', // Laser Pink
+      '#10b981', // Neon Emerald
+      '#f59e0b', // Solar Gold
+      '#06b6d4', // Deep Teal
+      '#6366f1'  // Indigo
+    ];
+
     const nodes: Array<{
       x: number;
       y: number;
@@ -534,19 +547,19 @@ function InfrastructureTopologyBackground({
       radius: number;
       label: string;
       color: string;
+      phase: number;
     }> = [];
 
-    const colors = ['#38bdf8', '#3b82f6', '#10b981', '#6366f1', '#06b6d4'];
-
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < 30; i++) {
       nodes.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.35,
-        vy: (Math.random() - 0.5) * 0.35,
-        radius: Math.random() * 2 + 2,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        radius: Math.random() * 2.5 + 2,
         label: topologyLabels[i % topologyLabels.length],
-        color: colors[i % colors.length]
+        color: colors[i % colors.length],
+        phase: Math.random() * Math.PI * 2
       });
     }
 
@@ -556,20 +569,39 @@ function InfrastructureTopologyBackground({
       frame++;
       ctx.clearRect(0, 0, width, height);
 
-      const horizonY = height * 0.45;
-      ctx.strokeStyle = 'rgba(30, 58, 138, 0.08)';
+      // Interactive Mouse Chromatic Light Field
+      if (mouse.active) {
+        const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 240);
+        mouseGlow.addColorStop(0, 'rgba(56, 189, 248, 0.22)');
+        mouseGlow.addColorStop(0.35, 'rgba(168, 85, 247, 0.12)');
+        mouseGlow.addColorStop(0.7, 'rgba(16, 185, 129, 0.05)');
+        mouseGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = mouseGlow;
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 240, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Dynamic Perspective Grid with Color-Shift Horizon
+      const horizonY = height * 0.42;
+      const vanishX = width * 0.5 + (mouse.x - width / 2) * 0.05;
+
+      const gridGrad = ctx.createLinearGradient(0, horizonY, 0, height);
+      gridGrad.addColorStop(0, 'rgba(59, 130, 246, 0.02)');
+      gridGrad.addColorStop(0.5, 'rgba(168, 85, 247, 0.08)');
+      gridGrad.addColorStop(1, 'rgba(6, 182, 212, 0.14)');
+      ctx.strokeStyle = gridGrad;
       ctx.lineWidth = 1;
 
-      // Perspective Grid Lines
-      const vanishX = width * 0.5 + (mouse.x - width / 2) * 0.04;
-      for (let x = -width * 0.5; x <= width * 1.5; x += width * 0.12) {
+      // Perspective Depth Grid Lines
+      for (let x = -width * 0.5; x <= width * 1.5; x += width * 0.1) {
         ctx.beginPath();
         ctx.moveTo(vanishX, horizonY);
         ctx.lineTo(x, height);
         ctx.stroke();
       }
 
-      const gridOffset = (frame * 0.35) % 40;
+      const gridOffset = (frame * 0.4) % 40;
       for (let y = horizonY + gridOffset; y < height; y += 40) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -577,7 +609,7 @@ function InfrastructureTopologyBackground({
         ctx.stroke();
       }
 
-      // Draw Connected Topology Conduits
+      // Draw Connected Nodes and Chromatic Conduits
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         n.x += n.vx;
@@ -589,41 +621,65 @@ function InfrastructureTopologyBackground({
         const dx = mouse.x - n.x;
         const dy = mouse.y - n.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 180 && mouse.active) {
-          n.x -= (dx / dist) * 0.5;
-          n.y -= (dy / dist) * 0.5;
+        if (dist < 190 && mouse.active) {
+          n.x -= (dx / dist) * 0.6;
+          n.y -= (dy / dist) * 0.6;
         }
 
-        // Draw node
+        // Draw pulsating node core
+        const pulseFactor = 1 + Math.sin(frame * 0.05 + n.phase) * 0.3;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-        ctx.fillStyle = dist < 140 ? '#38bdf8' : n.color;
-        ctx.shadowBlur = dist < 140 ? 10 : 0;
-        ctx.shadowColor = '#38bdf8';
+        ctx.arc(n.x, n.y, n.radius * pulseFactor, 0, Math.PI * 2);
+        ctx.fillStyle = dist < 150 ? '#00f0ff' : n.color;
+        ctx.shadowBlur = dist < 150 ? 14 : 8;
+        ctx.shadowColor = n.color;
         ctx.fill();
         ctx.shadowBlur = 0;
 
         // Label on nearby nodes
-        if (dist < 150) {
+        if (dist < 160) {
           ctx.font = '9px "Fira Code", monospace';
-          ctx.fillStyle = 'rgba(147, 197, 253, 0.8)';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.shadowBlur = 4;
+          ctx.shadowColor = n.color;
           ctx.fillText(n.label, n.x + 8, n.y + 3);
+          ctx.shadowBlur = 0;
         }
 
-        // Connect nearby nodes
+        // Connect nearby nodes with multi-color chromatic gradients
         for (let j = i + 1; j < nodes.length; j++) {
           const n2 = nodes[j];
           const ndx = n.x - n2.x;
           const ndy = n.y - n2.y;
           const nDist = Math.sqrt(ndx * ndx + ndy * ndy);
 
-          if (nDist < 160) {
-            const alpha = (1 - nDist / 160) * 0.15;
+          if (nDist < 175) {
+            const alpha = (1 - nDist / 175) * 0.35;
+            const grad = ctx.createLinearGradient(n.x, n.y, n2.x, n2.y);
+            grad.addColorStop(0, n.color);
+            grad.addColorStop(1, n2.color);
+
             ctx.beginPath();
             ctx.moveTo(n.x, n.y);
             ctx.lineTo(n2.x, n2.y);
-            ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+            ctx.strokeStyle = grad;
+            ctx.globalAlpha = alpha;
+            ctx.lineWidth = 1.2;
             ctx.stroke();
+            ctx.globalAlpha = 1;
+
+            // Animated high-speed data photon packets along conduit
+            const packetPos = (frame * 0.015 + (i + j) * 0.2) % 1;
+            const px = n.x + (n2.x - n.x) * packetPos;
+            const py = n.y + (n2.y - n.y) * packetPos;
+            
+            ctx.beginPath();
+            ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = n.color;
+            ctx.fill();
+            ctx.shadowBlur = 0;
           }
         }
       }
@@ -642,15 +698,24 @@ function InfrastructureTopologyBackground({
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
+      {/* Dynamic Chromatic Aurora Plasma Wave Layers */}
+      <div className="aurora-bg-container z-[0]">
+        <div className="aurora-orb aurora-orb-cyan-blue" />
+        <div className="aurora-orb aurora-orb-purple-pink" />
+        <div className="aurora-orb aurora-orb-emerald-teal" />
+        <div className="aurora-orb aurora-orb-amber-rose" />
+        <div className="aurora-orb aurora-orb-indigo-violet" />
+      </div>
+
       {showVideoOverlay && (
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-[1]">
           <video
             ref={videoRef}
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover object-center opacity-25 mix-blend-screen scale-105 transition-opacity duration-1000"
+            className="w-full h-full object-cover object-center opacity-30 mix-blend-screen scale-105 transition-opacity duration-1000"
           >
             <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-graphs-and-data-31913-large.mp4" type="video/mp4" />
           </video>
@@ -659,12 +724,12 @@ function InfrastructureTopologyBackground({
 
       <canvas 
         ref={canvasRef} 
-        className="absolute inset-0 w-full h-full opacity-65 z-[1]"
+        className="absolute inset-0 w-full h-full opacity-85 z-[2]"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-[#05070c]/90 via-[#05070c]/80 to-[#05070c] z-[2]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_30%,transparent_20%,#05070c_90%)] z-[2]" />
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px] opacity-25 z-[3]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#05070c]/70 via-[#05070c]/60 to-[#05070c]/85 z-[3]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_70%_at_50%_30%,transparent_30%,#05070c_95%)] z-[3]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,24,38,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-20 z-[4]" />
     </div>
   );
 }
